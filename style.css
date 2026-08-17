@@ -1,0 +1,581 @@
+/* =========================================
+   EMPLOYEE MANAGEMENT PORTAL
+   PROFESSIONAL COLORFUL UI
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fc;
+    color: #172033;
+}
+
+
+/* =========================================
+   LOGIN PAGE
+========================================= */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(135deg, #eef4ff, #f8f5ff);
+}
+
+.login-box {
+    width: 430px;
+    padding: 42px;
+    background: #ffffff;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(30, 60, 120, 0.15);
+}
+
+.logo {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    font-size: 25px;
+    font-weight: 800;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+}
+
+.login-box h1 {
+    font-size: 27px;
+    color: #172033;
+    margin-bottom: 7px;
+}
+
+.login-box > p {
+    color: #7b8496;
+    margin-bottom: 28px;
+}
+
+.login-box form {
+    text-align: left;
+}
+
+.login-box label {
+    display: block;
+    margin: 17px 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.login-box input {
+    width: 100%;
+    height: 48px;
+    padding: 0 15px;
+    border: 1px solid #dce2ec;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    background: #fafbfe;
+}
+
+.login-box input:focus {
+    border-color: #4f7df3;
+    box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.12);
+}
+
+.login-box button {
+    width: 100%;
+    height: 48px;
+    margin-top: 23px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login-box button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.login-box small {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: #7b8496;
+}
+
+#loginError {
+    color: #ef4444;
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   COMMON
+========================================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================
+   APPLICATION LAYOUT
+========================================= */
+
+.app-page {
+    min-height: 100vh;
+    display: flex;
+    background: #f4f7fc;
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar {
+    width: 245px;
+    min-height: 100vh;
+    padding: 28px 16px;
+    color: white;
+    background: linear-gradient(180deg, #101f3d 0%, #172f59 55%, #122442 100%);
+    box-shadow: 5px 0 25px rgba(20, 40, 80, 0.12);
+}
+
+.sidebar h2 {
+    padding: 0 14px;
+    margin-bottom: 34px;
+    font-size: 20px;
+    line-height: 1.3;
+    color: white;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 13px 15px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #cbd7ed;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.sidebar button:hover {
+    background: rgba(59, 130, 246, 0.25);
+    color: white;
+    transform: translateX(3px);
+}
+
+.sidebar button:last-child {
+    margin-top: 20px;
+    color: #ffb4b4;
+}
+
+.sidebar button:last-child:hover {
+    background: rgba(239, 68, 68, 0.18);
+    color: #ffffff;
+}
+
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 0 32px 45px;
+}
+
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.topbar {
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #e4e9f2;
+}
+
+.topbar h2 {
+    color: #18243a;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.topbar span {
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: #eef3ff;
+    color: #315ac8;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   PAGE HEADINGS
+========================================= */
+
+.page h1 {
+    color: #18243a;
+    font-size: 30px;
+    margin-bottom: 6px;
+}
+
+.page > p {
+    color: #7b8496;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================
+   DASHBOARD CARDS
+========================================= */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 25px 0 35px;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    min-height: 130px;
+    padding: 23px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: white;
+    box-shadow: 0 8px 25px rgba(35, 55, 95, 0.07);
+}
+
+.card:nth-child(1) {
+    background: linear-gradient(135deg, #eaf3ff, #dceaff);
+}
+
+.card:nth-child(2) {
+    background: linear-gradient(135deg, #eafff1, #d9f8e4);
+}
+
+.card:nth-child(3) {
+    background: linear-gradient(135deg, #fff7dc, #ffefb9);
+}
+
+.card:nth-child(4) {
+    background: linear-gradient(135deg, #f6eaff, #ead9ff);
+}
+
+.card h3 {
+    color: #566176;
+    font-size: 14px;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.card strong {
+    font-size: 32px;
+    color: #172033;
+}
+
+
+/* =========================================
+   SECTION HEADINGS
+========================================= */
+
+.page h2 {
+    margin-top: 10px;
+    color: #202b40;
+    font-size: 20px;
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+table {
+    width: 100%;
+    margin-top: 18px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(35, 55, 95, 0.05);
+}
+
+th {
+    padding: 15px 14px;
+    background: #f7f9fd;
+    color: #59657a;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e6eaf1;
+}
+
+td {
+    padding: 15px 14px;
+    color: #39445a;
+    font-size: 13px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+tbody tr:hover {
+    background: #f8faff;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================
+   STATUS LOOK
+========================================= */
+
+td:last-child {
+    font-weight: 700;
+}
+
+
+/* =========================================
+   ADD EMPLOYEE BUTTON
+========================================= */
+
+#addEmployeeBtn {
+    margin-top: 5px;
+    padding: 12px 19px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(37, 99, 235, 0.2);
+}
+
+#addEmployeeBtn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =========================================
+   EMPLOYEE FORM
+========================================= */
+
+#employeeForm {
+    max-width: 760px;
+    margin-top: 25px;
+    padding: 30px;
+    background: white;
+    border: 1px solid #e5eaf2;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(35, 55, 95, 0.06);
+}
+
+#employeeForm label {
+    display: block;
+    margin: 17px 0 8px;
+    color: #39445a;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+#employeeForm input,
+#employeeForm select {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+    border: 1px solid #dce2ec;
+    border-radius: 8px;
+    outline: none;
+    background: #fafbfe;
+    color: #303b50;
+}
+
+#employeeForm input:focus,
+#employeeForm select:focus {
+    border-color: #4f7df3;
+    box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.1);
+}
+
+#employeeForm button {
+    margin-top: 24px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   PROFILE
+========================================= */
+
+.profile-box {
+    max-width: 620px;
+    margin-top: 25px;
+    padding: 30px;
+    background: white;
+    border: 1px solid #e5eaf2;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(35, 55, 95, 0.06);
+}
+
+.profile-box h2 {
+    margin: 0 0 20px;
+    color: #1d2a43;
+}
+
+.profile-box p {
+    margin-top: 13px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f7f9fd;
+    color: #667085;
+}
+
+
+/* =========================================
+   REPORTS
+========================================= */
+
+#reportsPage .cards {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f4f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b9c5d8;
+    border-radius: 10px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 220px;
+    }
+
+    .main-content {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .app-page {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .sidebar nav {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar button:last-child {
+        margin-top: 0;
+    }
+
+    .main-content {
+        padding: 0 15px 30px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        height: 65px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .login-box {
+        width: calc(100% - 30px);
+        padding: 30px 22px;
+    }
+
+    .sidebar nav {
+        grid-template-columns: 1fr;
+    }
+
+    .page h1 {
+        font-size: 25px;
+    }
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- LOGIN PAGE -->
+    <section id="loginPage" class="login-page">
+        <div class="login-box">
+            <div class="logo">EM</div>
+
+            <h1>Employee Management</h1>
+            <p>Portal Login</p>
+
+            <form id="loginForm">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+
+                <button type="submit">Login</button>
+
+                <div id="loginError"></div>
+
+                <small>Demo: admin / admin123</small>
+            </form>
+        </div>
+    </section>
+
+
+    <!-- APPLICATION -->
+    <section id="appPage" class="app-page hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2>Employee Management</h2>
+
+            <nav>
+                <button data-page="dashboard">Dashboard</button>
+                <button data-page="employees">Employees</button>
+                <button data-page="addEmployee">Add Employee</button>
+                <button data-page="departments">Departments</button>
+                <button data-page="reports">Reports</button>
+                <button data-page="profile">Profile</button>
+                <button id="logoutBtn">Logout</button>
+            </nav>
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <h2>Employee Management Portal</h2>
+                <span>Admin</span>
+            </header>
+
+
+            <!-- DASHBOARD -->
+            <div id="dashboardPage" class="page">
+
+                <h1>Dashboard</h1>
+                <p>Welcome back, Admin!</p>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <h3>Total Employees</h3>
+                        <strong id="totalEmployees">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Active Employees</h3>
+                        <strong id="activeEmployees">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Departments</h3>
+                        <strong id="totalDepartments">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>New Joiners</h3>
+                        <strong id="newJoiners">0</strong>
+                    </div>
+
+                </div>
+
+                <h2>Employee Overview</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="recentEmployees"></tbody>
+                </table>
+
+            </div>
+
+
+            <!-- EMPLOYEES -->
+            <div id="employeesPage" class="page hidden">
+
+                <h1>Employees</h1>
+                <p>Manage all employees</p>
+
+                <button id="addEmployeeBtn">+ Add Employee</button>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="employeeTable"></tbody>
+                </table>
+
+            </div>
+
+
+            <!-- ADD EMPLOYEE -->
+            <div id="addEmployeePage" class="page hidden">
+
+                <h1>Add New Employee</h1>
+
+                <form id="employeeForm">
+
+                    <label>Full Name</label>
+                    <input type="text" id="employeeName" required>
+
+                    <label>Email</label>
+                    <input type="email" id="employeeEmail" required>
+
+                    <label>Department</label>
+                    <select id="employeeDepartment" required>
+                        <option value="">Select Department</option>
+                    </select>
+
+                    <label>Role</label>
+                    <input type="text" id="employeeRole" required>
+
+                    <label>Status</label>
+                    <select id="employeeStatus">
+                        <option>Active</option>
+                        <option>On Leave</option>
+                        <option>Inactive</option>
+                    </select>
+
+                    <button type="submit">Save Employee</button>
+
+                </form>
+
+            </div>
+
+
+            <!-- DEPARTMENTS -->
+            <div id="departmentsPage" class="page hidden">
+
+                <h1>Departments</h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Department Name</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="departmentTable"></tbody>
+                </table>
+
+            </div>
+
+
+            <!-- REPORTS -->
+            <div id="reportsPage" class="page hidden">
+
+                <h1>Reports</h1>
+
+                <div class="cards">
+                    <div class="card">
+                        <h3>Total Employees</h3>
+                        <strong id="reportTotal">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Active Employees</h3>
+                        <strong id="reportActive">0</strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- PROFILE -->
+            <div id="profilePage" class="page hidden">
+
+                <h1>My Profile</h1>
+
+                <div class="profile-box">
+                    <h2>Admin User</h2>
+                    <p>Email: admin@example.com</p>
+                    <p>Role: Administrator</p>
+                </div>
+
+            </div>
+
+        </main>
+    </section>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
