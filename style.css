@@ -579,3 +579,929 @@ td:last-child {
         font-size: 25px;
     }
 }
+/* =========================================
+   NEW PROFESSIONAL DASHBOARD
+========================================= */
+
+.dashboard-cards {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.dashboard-cards .card {
+    min-height: 125px;
+    padding: 20px;
+}
+
+.dashboard-cards .card h3 {
+    margin-bottom: 10px;
+}
+
+.dashboard-cards .card strong {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 7px;
+}
+
+.dashboard-cards .card small {
+    display: block;
+    color: #667085;
+    font-size: 12px;
+}
+
+/* Different card colors */
+
+.dashboard-cards .card:nth-child(1) {
+    background: linear-gradient(135deg, #eaf3ff, #dceaff);
+}
+
+.dashboard-cards .card:nth-child(2) {
+    background: linear-gradient(135deg, #eafff1, #d9f8e4);
+}
+
+.dashboard-cards .card:nth-child(3) {
+    background: linear-gradient(135deg, #fff7dc, #ffefb9);
+}
+
+.dashboard-cards .card:nth-child(4) {
+    background: linear-gradient(135deg, #ffecef, #ffdfe5);
+}
+
+.dashboard-cards .card:nth-child(5) {
+    background: linear-gradient(135deg, #f5eaff, #eadcff);
+}
+
+.dashboard-cards .card:nth-child(6) {
+    background: linear-gradient(135deg, #e9efff, #dce6ff);
+}
+
+.dashboard-cards .card:nth-child(7) {
+    background: linear-gradient(135deg, #f1eaff, #e7dcff);
+}
+
+
+/* =========================================
+   DASHBOARD GRID
+========================================= */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-panel {
+    background: #ffffff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(35, 55, 95, 0.05);
+    overflow: hidden;
+}
+
+.dashboard-panel h2 {
+    margin: 0 0 18px;
+    font-size: 16px;
+    color: #202b40;
+}
+
+
+/* =========================================
+   CHART AREA
+========================================= */
+.chart-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.chart-label {
+    width: 180px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #202b40;
+}
+
+.chart-bar {
+    flex: 1;
+    height: 18px;
+    background: #eef2f7;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.chart-bar span {
+    display: block;
+    height: 100%;
+    background: #2563eb;
+    border-radius: 10px;
+}
+    
+
+
+.chart-bar span {
+    display: block;
+    height: 100%;
+    border-radius: 10px;
+    background: #2563eb;
+}
+
+.chart-placeholder {
+    min-height: 230px;
+    display: block;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #f8faff;
+    border: 1px dashed #d8e0ee;
+    color: #7b8496;
+    text-align: center;
+}
+
+.chart-placeholder p {
+    font-size: 13px;
+}
+
+
+/* =========================================
+   PANEL HEADER
+========================================= */
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.panel-header h2 {
+    margin: 0;
+}
+
+.panel-header button {
+    border: none;
+    background: transparent;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+
+/* =========================================
+   ALERTS
+========================================= */
+
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 9px;
+    background: #f8faff;
+}
+
+.alert-item span {
+    color: #2563eb;
+    font-size: 14px;
+}
+
+.alert-item p {
+    margin: 0;
+    color: #59657a;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   DASHBOARD RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-panel {
+        padding: 15px;
+    }
+}
+/* ==========================================
+   FINAL DASHBOARD UI UPGRADE
+   ========================================== */
+
+.topbar {
+    height: 70px;
+    padding: 0 28px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.topbar-left h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.menu-btn {
+    border: none;
+    background: transparent;
+    font-size: 22px;
+    cursor: pointer;
+    color: #374151;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+#globalSearch {
+    width: 280px;
+    height: 40px;
+    padding: 0 15px;
+    border: 1px solid #dbe1ea;
+    border-radius: 8px;
+    outline: none;
+    font-size: 13px;
+    background: #ffffff;
+}
+
+#globalSearch:focus {
+    border-color: #2563eb;
+}
+
+.notification-btn {
+    position: relative;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e8eefc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #1d4ed8;
+}
+
+.admin-profile strong {
+    display: block;
+    font-size: 13px;
+    color: #111827;
+}
+
+.admin-profile small {
+    display: block;
+    font-size: 10px;
+    color: #6b7280;
+}
+
+
+/* ---------- DASHBOARD HEADER ---------- */
+
+#dashboardPage {
+    padding: 28px;
+}
+
+#dashboardPage > h1 {
+    margin-bottom: 6px;
+    font-size: 28px;
+    color: #111827;
+}
+
+#dashboardPage > p {
+    margin-bottom: 24px;
+    color: #6b7280;
+}
+
+
+/* ---------- DASHBOARD CARDS ---------- */
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.dashboard-cards .card {
+    min-height: 105px;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-cards .card:nth-child(1) {
+    background: #eef5ff;
+}
+
+.dashboard-cards .card:nth-child(2) {
+    background: #effcf3;
+}
+
+.dashboard-cards .card:nth-child(3) {
+    background: #fff9e8;
+}
+
+.dashboard-cards .card:nth-child(4) {
+    background: #fff0f1;
+}
+
+.dashboard-cards .card:nth-child(5) {
+    background: #f7efff;
+}
+
+.dashboard-cards .card:nth-child(6) {
+    background: #eef4ff;
+}
+
+.dashboard-cards .card:nth-child(7) {
+    background: #f7f0ff;
+}
+
+.dashboard-cards .card h3 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: #374151;
+}
+
+.dashboard-cards .card strong {
+    display: block;
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.dashboard-cards .card small {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* ---------- DASHBOARD PANELS ---------- */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.dashboard-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-panel h2 {
+    margin: 0 0 18px;
+    font-size: 15px;
+    color: #111827;
+}
+
+
+/* ---------- TABLE ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11px;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+table td {
+    padding: 12px;
+    font-size: 12px;
+    color: #374151;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+table tr:hover {
+    background: #f8fafc;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1000px) {
+
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #globalSearch {
+        width: 200px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+    .admin-profile div {
+        display: none;
+    }
+
+    #globalSearch {
+        width: 150px;
+    }
+
+    #dashboardPage {
+        padding: 18px;
+    }
+}
+/* =========================================
+   PREMIUM UI UPGRADE
+========================================= */
+
+body {
+    background:
+        radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.08), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(124, 58, 237, 0.08), transparent 30%),
+        #f5f7fc;
+}
+
+/* Sidebar */
+.sidebar {
+    background:
+        linear-gradient(180deg, #0b1630 0%, #172f59 50%, #101f3d 100%);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar h2 {
+    letter-spacing: 0.3px;
+}
+
+/* Top bar */
+.topbar {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(220,226,236,0.8);
+}
+
+/* Dashboard cards */
+.card {
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow:
+        0 10px 30px rgba(31, 41, 70, 0.08),
+        0 2px 6px rgba(31, 41, 70, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 18px 35px rgba(31, 41, 70, 0.12);
+}
+
+/* Tables */
+table {
+    border: none;
+    box-shadow: 0 12px 35px rgba(31, 41, 70, 0.08);
+}
+
+th {
+    background: linear-gradient(135deg, #f7f9fd, #eef3ff);
+    color: #44516a;
+}
+
+td {
+    background: rgba(255,255,255,0.92);
+}
+
+/* Buttons */
+button {
+    transition: all 0.2s ease;
+}
+
+#addEmployeeBtn,
+#employeeForm button {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 8px 20px rgba(79,70,229,0.22);
+}
+
+#addEmployeeBtn:hover,
+#employeeForm button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(79,70,229,0.3);
+}
+
+/* Forms */
+#employeeForm,
+.profile-box {
+    box-shadow:
+        0 15px 40px rgba(31,41,70,0.08);
+}
+
+/* Page headings */
+.page h1 {
+    letter-spacing: -0.5px;
+}
+
+.page > p {
+    color: #7b8496;
+}
+
+/* Chart containers */
+.chart-placeholder {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid #e5eaf2;
+    box-shadow: 0 10px 30px rgba(31,41,70,0.06);
+    border-radius: 16px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .main-content {
+        padding: 0 15px 30px;
+    }
+
+    .topbar {
+        padding: 0 5px;
+    }
+
+    .page h1 {
+        font-size: 26px;
+    }
+
+    .card {
+        min-height: 115px;
+    }
+}
+/* =========================================================
+   PREMIUM EMPLOYEE MANAGEMENT PORTAL UI
+   ========================================================= */
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --secondary: #7c3aed;
+    --accent: #06b6d4;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+
+    --bg: #f4f7ff;
+    --card: rgba(255, 255, 255, 0.92);
+    --text: #172033;
+    --muted: #64748b;
+    --border: #e2e8f0;
+
+    --shadow: 0 12px 35px rgba(51, 65, 85, 0.12);
+}
+
+/* MAIN BACKGROUND */
+body {
+    background:
+        radial-gradient(circle at 10% 10%, rgba(124, 58, 237, 0.12), transparent 30%),
+        radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.12), transparent 30%),
+        linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0fdfa 100%);
+
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* MAIN APP AREA */
+#appPage {
+    background: transparent;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: linear-gradient(180deg, #312e81 0%, #4f46e5 55%, #6d28d9 100%);
+    box-shadow: 8px 0 30px rgba(49, 46, 129, 0.18);
+}
+
+.sidebar a,
+.sidebar button {
+    transition: all 0.25s ease;
+}
+
+.sidebar a:hover,
+.sidebar button:hover {
+    background: rgba(255,255,255,0.16);
+    transform: translateX(4px);
+}
+
+/* TOP HEADER */
+header,
+.topbar,
+.navbar {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(226,232,240,0.8);
+}
+
+/* PAGE HEADINGS */
+h1,
+h2,
+h3 {
+    color: #172033;
+    letter-spacing: -0.4px;
+}
+
+h1 {
+    font-weight: 750;
+}
+
+/* DASHBOARD CARDS */
+.card,
+.stat-card,
+.dashboard-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover,
+.stat-card:hover,
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(51,65,85,0.17);
+}
+
+/* STAT NUMBERS */
+.stat-card h2,
+.stat-card .number {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+/* ADD EMPLOYEE BUTTON */
+button,
+.btn {
+    border-radius: 10px;
+    transition: all 0.25s ease;
+}
+
+button[type="submit"],
+.add-btn,
+.primary-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    box-shadow: 0 8px 20px rgba(79,70,229,0.25);
+}
+
+button[type="submit"]:hover,
+.add-btn:hover,
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(79,70,229,0.35);
+}
+
+/* TABLE CONTAINER */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(255,255,255,0.95);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+/* TABLE HEADER */
+thead {
+    background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+}
+
+th {
+    color: #3730a3;
+    font-weight: 700;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* TABLE BODY */
+td {
+    padding: 15px 16px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+}
+
+tbody tr {
+    transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #f8faff;
+    transform: scale(1.002);
+}
+
+/* RESIGN BUTTON */
+button[onclick*="resignEmployee"] {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-weight: 600;
+    box-shadow: 0 5px 14px rgba(239,68,68,0.18);
+}
+
+button[onclick*="resignEmployee"]:hover {
+    transform: translateY(-2px);
+}
+
+/* REJOIN BUTTON */
+button[onclick*="rejoinEmployee"] {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-weight: 600;
+    box-shadow: 0 5px 14px rgba(16,185,129,0.2);
+}
+
+button[onclick*="rejoinEmployee"]:hover {
+    transform: translateY(-2px);
+}
+
+/* INPUTS */
+input,
+select,
+textarea {
+    border: 1px solid #dbe3ef;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.95);
+    color: var(--text);
+    transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.10);
+}
+
+/* SEARCH BOX */
+#globalSearch {
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 5px 18px rgba(51,65,85,0.07);
+}
+
+#globalSearch:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.10);
+}
+
+/* STATUS BADGES */
+.status-active,
+.status-Active {
+    color: #047857;
+    background: #d1fae5;
+}
+
+.status-resigned,
+.status-Resigned {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+/* MODALS */
+.modal,
+.modal-content {
+    border-radius: 20px;
+    box-shadow: 0 25px 70px rgba(15,23,42,0.25);
+}
+
+/* LOGIN PAGE */
+#loginPage {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(124,58,237,0.35), transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(6,182,212,0.3), transparent 35%),
+        linear-gradient(135deg, #1e1b4b, #312e81, #4c1d95);
+}
+
+/* LOGIN CARD */
+.login-container,
+.login-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 24px;
+    box-shadow: 0 25px 80px rgba(15,23,42,0.35);
+}
+
+/* ALERTS */
+.alert,
+.notification {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15,23,42,0.15);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    body {
+        background: #f4f7ff;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    th,
+    td {
+        padding: 11px 8px;
+    }
+
+    .card,
+    .stat-card,
+    .dashboard-card {
+        border-radius: 14px;
+    }
+}

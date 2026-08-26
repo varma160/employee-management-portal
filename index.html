@@ -56,60 +56,168 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
 
-            <header class="topbar">
-                <h2>Employee Management Portal</h2>
-                <span>Admin</span>
-            </header>
+            <<header class="topbar">
+
+    <div class="topbar-left">
+        <button class="menu-btn" type="button">☰</button>
+        <h2>Dashboard</h2>
+    </div>
+
+    <div class="topbar-right">
+
+        <input
+            type="text"
+            id="globalSearch"
+            placeholder="Search by name, ID, email..."
+        >
+
+        <button class="notification-btn" type="button">
+            🔔
+            <span class="notification-badge">3</span>
+        </button>
+
+        <div class="admin-profile">
+            <div class="admin-avatar">A</div>
+
+            <div>
+                <strong>Admin</strong>
+                <small>Super Admin</small>
+            </div>
+        </div>
+
+    </div>
+
+</header>
 
 
             <!-- DASHBOARD -->
-            <div id="dashboardPage" class="page">
+<div id="dashboardPage" class="page">
 
-                <h1>Dashboard</h1>
-                <p>Welcome back, Admin!</p>
+    <h1>Dashboard</h1>
+    <p>Welcome back, Admin!</p>
 
-                <div class="cards">
+    <div class="cards dashboard-cards">
 
-                    <div class="card">
-                        <h3>Total Employees</h3>
-                        <strong id="totalEmployees">0</strong>
-                    </div>
+        <div class="card">
+            <h3>Total Employees</h3>
+            <strong id="totalEmployees">0</strong>
+            <small>Total workforce</small>
+        </div>
 
-                    <div class="card">
-                        <h3>Active Employees</h3>
-                        <strong id="activeEmployees">0</strong>
-                    </div>
+        <div class="card">
+            <h3>Active Employees</h3>
+            <strong id="activeEmployees">0</strong>
+            <small>Currently active</small>
+        </div>
 
-                    <div class="card">
-                        <h3>Departments</h3>
-                        <strong id="totalDepartments">0</strong>
-                    </div>
+        <div class="card">
+            <h3>On Leave</h3>
+            <strong id="onLeaveEmployees">0</strong>
+            <small>Currently on leave</small>
+        </div>
 
-                    <div class="card">
-                        <h3>New Joiners</h3>
-                        <strong id="newJoiners">0</strong>
-                    </div>
+        <div class="card">
+            <h3>Resigned Employees</h3>
+            <strong id="resignedEmployees">0</strong>
+            <small>Former employees</small>
+        </div>
 
+        <div class="card">
+            <h3>New Joiners</h3>
+            <strong id="newJoiners">0</strong>
+            <small>Recent joiners</small>
+        </div>
+
+        <div class="card">
+            <h3>Rejoined Employees</h3>
+            <strong id="rejoinedEmployees">0</strong>
+            <small>Returned employees</small>
+        </div>
+
+        <div class="card">
+            <h3>Departments</h3>
+            <strong id="totalDepartments">0</strong>
+            <small>Active departments</small>
+        </div>
+
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-panel">
+            <h2>Department Wise Distribution</h2>
+
+            <div id="departmentDistribution" class="chart-placeholder">
+                <p>Department distribution will appear here.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-panel">
+            <h2>Joining vs Resignation Trend</h2>
+
+            <div id="joiningResignationTrend" class="chart-placeholder">
+                <p>Joining and resignation trend will appear here.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-panel">
+
+            <div class="panel-header">
+                <h2>Recent Employees</h2>
+                <button type="button">View All</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Department</th>
+                        <th>Joining Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="recentEmployees"></tbody>
+            </table>
+
+        </div>
+
+        <div class="dashboard-panel">
+
+            <div class="panel-header">
+                <h2>Alerts & Notifications</h2>
+            </div>
+
+            <div id="dashboardAlerts" class="alerts-list">
+
+                <div class="alert-item">
+                    <span>●</span>
+                    <p>Employee retention reviews will appear here.</p>
                 </div>
 
-                <h2>Employee Overview</h2>
+                <div class="alert-item">
+                    <span>●</span>
+                    <p>Rejoining eligibility alerts will appear here.</p>
+                </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Department</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="recentEmployees"></tbody>
-                </table>
+                <div class="alert-item">
+                    <span>●</span>
+                    <p>Pending employee actions will appear here.</p>
+                </div>
 
             </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 
             <!-- EMPLOYEES -->
@@ -157,6 +265,8 @@
 
                     <label>Role</label>
                     <input type="text" id="employeeRole" required>
+<label for="joiningDate">Joining Date</label>
+<input type="date" id="joiningDate" required>
 
                     <label>Status</label>
                     <select id="employeeStatus">
