@@ -1,794 +1,2551 @@
-// ==========================================================
-// EMPLOYEE MANAGEMENT PORTAL
-// REAL OFFICE STYLE DEMO APPLICATION
-// ==========================================================
+/* =========================================================
+   EMPLOYEE MANAGEMENT PORTAL
+   Existing Project - Functional JavaScript
+   ========================================================= */
+
+"use strict";
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+
+const STORAGE_KEY = "employeeManagementPortal_v2";
+
+const DEFAULT_ADMIN = {
+    username: "admin",
+    password: "admin123",
+    name: "Admin User",
+    role: "Super Admin",
+    email: "admin@example.com",
+    employeeId: "ADMIN001"
+};
+
+let state = {
+    employees: [],
+    departments: [],
+    leaveRequests: [],
+    resignationRequests: [],
+    attendance: [],
+    notifications: [],
+    currentUser: null
+};
 
 
-// ==========================================================
-// DEFAULT DATA
-// ==========================================================
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-const DEFAULT_EMPLOYEES = [
-    {
-        id: "EMP1001",
-        name: "Mohan Sai Varma",
-        email: "mohansaivarma@company.com",
-        phone: "9876543210",
-        department: "Engineering",
-        role: "Software Engineer",
-        status: "Active",
-        joiningDate: "2026-01-10",
-        resignationDate: null,
-        rejoined: false,
-        rejoiningRemarks: ""
-    },
-    {
-        id: "EMP1002",
-        name: "Priya Reddy",
-        email: "priya@company.com",
-        phone: "9876543211",
-        department: "Human Resources",
-        role: "HR Executive",
-        status: "Active",
-        joiningDate: "2026-02-15",
-        resignationDate: null,
-        rejoined: false,
-        rejoiningRemarks: ""
-    },
-    {
-        id: "EMP1003",
-        name: "Arjun Kumar",
-        email: "arjun@company.com",
-        phone: "9876543212",
-        department: "Finance",
-        role: "Financial Analyst",
-        status: "On Leave",
-        joiningDate: "2026-03-20",
-        resignationDate: null,
-        rejoined: false,
-        rejoiningRemarks: ""
-    },
-    {
-        id: "EMP1004",
-        name: "Sneha Patel",
-        email: "sneha@company.com",
-        phone: "9876543213",
-        department: "Marketing",
-        role: "Marketing Executive",
-        status: "Active",
-        joiningDate: "2026-04-10",
-        resignationDate: null,
-        rejoined: false,
-        rejoiningRemarks: ""
+function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (saved) {
+        try {
+            state = JSON.parse(saved);
+        } catch (error) {
+            console.error("Storage error:", error);
+            createInitialData();
+        }
+    } else {
+        createInitialData();
     }
-];
+
+    if (!state.employees) state.employees = [];
+    if (!state.departments) state.departments = [];
+    if (!state.leaveRequests) state.leaveRequests = [];
+    if (!state.resignationRequests) state.resignationRequests = [];
+    if (!state.attendance) state.attendance = [];
+    if (!state.notifications) state.notifications = [];
+}
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+function today() {
+    return new Date().toISOString().split("T")[0];
+}
+
+function formatDate(dateString) {
+    if (!dateString) return "-";
+
+    const date = new Date(dateString + "T00:00:00");
+
+    if (isNaN(date.getTime())) return dateString;
+
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function getInitials(name) {
+    return String(name || "User")
+        .split(" ")
+        .map(word => word.charAt(0))
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+}
+
+function generateId(prefix, number) {
+    return `${prefix}${String(number).padStart(4, "0")}`;
+}
+
+function showMessage(message, type = "success") {
+    const box = document.createElement("div");
+
+    box.textContent = message;
+
+    box.style.position = "fixed";
+    box.style.right = "25px";
+    box.style.bottom = "25px";
+    box.style.zIndex = "99999";
+    box.style.padding = "14px 20px";
+    box.style.borderRadius = "8px";
+    box.style.fontSize = "14px";
+    box.style.fontWeight = "600";
+    box.style.boxShadow = "0 5px 20px rgba(0,0,0,.2)";
+    box.style.color = "#fff";
+
+    if (type === "error") {
+        box.style.background = "#dc2626";
+    } else {
+        box.style.background = "#16a34a";
+    }
+
+    document.body.appendChild(box);
+
+    setTimeout(() => {
+        box.remove();
+    }, 3000);
+}
 
 
-const DEFAULT_DEPARTMENTS = [
-    "Engineering",
+/* =========================================================
+   DEFAULT DATA
+   ========================================================= */
+
+const departmentNames = [
+    "Information Technology",
     "Human Resources",
     "Finance",
+    "Sales",
     "Marketing",
     "Operations",
-    "Sales"
+    "Customer Support",
+    "Administration",
+    "Engineering",
+    "Quality Assurance"
 ];
 
+const firstNames = [
+    "Aarav", "Arjun", "Rahul", "Rohan", "Vikram",
+    "Kiran", "Sai", "Varun", "Vivek", "Aditya",
+    "Anil", "Manoj", "Sandeep", "Prakash", "Naveen",
+    "Priya", "Ananya", "Sneha", "Pooja", "Divya",
+    "Kavya", "Swathi", "Keerthi", "Neha", "Meena"
+];
 
-// ==========================================================
-// LOCAL STORAGE
-// ==========================================================
+const lastNames = [
+    "Sharma", "Reddy", "Kumar", "Verma", "Rao",
+    "Patel", "Singh", "Das", "Naidu", "Iyer",
+    "Gupta", "Mishra", "Joshi", "Nair", "Varma",
+    "Chowdary", "Reddy", "Krishna", "Babu", "Pillai"
+];
 
-function loadData(key, fallback) {
+const roles = [
+    "Software Engineer",
+    "Senior Software Engineer",
+    "HR Executive",
+    "HR Manager",
+    "Accountant",
+    "Finance Executive",
+    "Sales Executive",
+    "Sales Manager",
+    "Marketing Executive",
+    "Operations Executive",
+    "Support Executive",
+    "System Administrator",
+    "QA Engineer",
+    "Team Lead",
+    "Project Manager"
+];
 
-    try {
+function randomDate(startYear = 2019, endYear = 2026) {
+    const start = new Date(`${startYear}-01-01`).getTime();
+    const end = new Date(`${endYear}-08-29`).getTime();
 
-        const saved = localStorage.getItem(key);
+    return new Date(
+        start + Math.random() * (end - start)
+    ).toISOString().split("T")[0];
+}
 
-        if (saved) {
-            return JSON.parse(saved);
+function createInitialData() {
+
+    state.departments = departmentNames.map((name, index) => ({
+        id: `DEP${String(index + 1).padStart(3, "0")}`,
+        name,
+        status: "Active"
+    }));
+
+    state.employees = [];
+
+    for (let i = 1; i <= 1700; i++) {
+
+        const first = firstNames[i % firstNames.length];
+        const last = lastNames[i % lastNames.length];
+
+        const department =
+            state.departments[i % state.departments.length];
+
+        const statusRandom = Math.random();
+
+        let status = "Active";
+
+        if (statusRandom < 0.06) {
+            status = "On Leave";
+        } else if (statusRandom < 0.10) {
+            status = "Inactive";
         }
 
-    } catch (error) {
+        const name = `${first} ${last}`;
 
-        console.error("Storage error:", error);
-
+        state.employees.push({
+            id: generateId("EMP", i),
+            name,
+            email: `${first.toLowerCase()}.${last.toLowerCase()}${i}@company.com`,
+            phone: `9${String(100000000 + i).slice(0, 9)}`,
+            department: department.name,
+            role: roles[i % roles.length],
+            joiningDate: randomDate(),
+            status,
+            password: "emp123",
+            terminationDate: null,
+            terminationReason: null,
+            previousJoiningDates: []
+        });
     }
 
-    return fallback;
+    state.leaveRequests = [];
+    state.resignationRequests = [];
+    state.attendance = [];
+    state.notifications = [];
+
+    saveState();
 }
 
 
-let employees = loadData(
-    "emp_portal_employees",
-    DEFAULT_EMPLOYEES
-);
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
-let departments = loadData(
-    "emp_portal_departments",
-    DEFAULT_DEPARTMENTS
-);
+function login(username, password) {
 
-let leaveRequests = loadData(
-    "emp_portal_leave_requests",
-    []
-);
+    username = username.trim();
+    password = password.trim();
 
-let resignationRequests = loadData(
-    "emp_portal_resignation_requests",
-    []
-);
-
-let attendanceRecords = loadData(
-    "emp_portal_attendance",
-    []
-);
-
-
-// ==========================================================
-// SAVE DATA
-// ==========================================================
-
-function saveAllData() {
-
-    localStorage.setItem(
-        "emp_portal_employees",
-        JSON.stringify(employees)
-    );
-
-    localStorage.setItem(
-        "emp_portal_departments",
-        JSON.stringify(departments)
-    );
-
-    localStorage.setItem(
-        "emp_portal_leave_requests",
-        JSON.stringify(leaveRequests)
-    );
-
-    localStorage.setItem(
-        "emp_portal_resignation_requests",
-        JSON.stringify(resignationRequests)
-    );
-
-    localStorage.setItem(
-        "emp_portal_attendance",
-        JSON.stringify(attendanceRecords)
-    );
-}
-
-
-// ==========================================================
-// CURRENT USER
-// ==========================================================
-
-let currentUser = null;
-
-
-// ==========================================================
-// DOM
-// ==========================================================
-
-const loginPage =
-    document.getElementById("loginPage");
-
-const appPage =
-    document.getElementById("appPage");
-
-const loginForm =
-    document.getElementById("loginForm");
-
-const loginError =
-    document.getElementById("loginError");
-
-
-// ==========================================================
-// LOGIN
-// ==========================================================
-
-if (loginForm) {
-
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-            const username =
-                document
-                    .getElementById("username")
-                    .value
-                    .trim();
-
-            const password =
-                document
-                    .getElementById("password")
-                    .value
-                    .trim();
-
-
-            // ADMIN LOGIN
-
-            if (
-                username === "admin" &&
-                password === "admin123"
-            ) {
-
-                currentUser = {
-                    type: "admin",
-                    username: "admin",
-                    name: "Admin",
-                    role: "Super Admin",
-                    email: "admin@example.com",
-                    employeeId: null
-                };
-
-                startApplication();
-
-                return;
-            }
-
-
-            // EMPLOYEE LOGIN
-            //
-            // Demo:
-            // Username: EMP1001
-            // Password: employee123
-
-            if (
-                password === "employee123"
-            ) {
-
-                const employee =
-                    employees.find(
-                        function (item) {
-
-                            return (
-                                item.id.toLowerCase() ===
-                                username.toLowerCase()
-                            );
-
-                        }
-                    );
-
-
-                if (employee) {
-
-                    currentUser = {
-
-                        type: "employee",
-
-                        username:
-                            employee.id,
-
-                        name:
-                            employee.name,
-
-                        role:
-                            employee.role,
-
-                        email:
-                            employee.email,
-
-                        employeeId:
-                            employee.id
-
-                    };
-
-
-                    startApplication();
-
-                    return;
-
-                }
-
-            }
-
-
-            if (loginError) {
-
-                loginError.textContent =
-                    "Invalid username or password.";
-
-            }
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// START APPLICATION
-// ==========================================================
-
-function startApplication() {
-
-    loginPage.classList.add("hidden");
-
-    appPage.classList.remove("hidden");
-
-    if (loginError) {
-        loginError.textContent = "";
-    }
-
-    updateCurrentUserUI();
-
-    setupRoleNavigation();
-
-    showPage("dashboard");
-
-    updateAll();
-
-}
-
-
-// ==========================================================
-// LOGOUT
-// ==========================================================
-
-const logoutBtn =
-    document.getElementById("logoutBtn");
-
-
-if (logoutBtn) {
-
-    logoutBtn.addEventListener(
-        "click",
-        function () {
-
-            currentUser = null;
-
-            appPage.classList.add("hidden");
-
-            loginPage.classList.remove("hidden");
-
-            document.getElementById("username").value = "";
-
-            document.getElementById("password").value = "";
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// CURRENT USER UI
-// ==========================================================
-
-function updateCurrentUserUI() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const nameElement =
-        document.getElementById(
-            "currentUserName"
-        );
-
-    const roleElement =
-        document.getElementById(
-            "currentUserRole"
-        );
-
-    const avatarElement =
-        document.getElementById(
-            "currentUserAvatar"
-        );
-
-
-    if (nameElement) {
-        nameElement.textContent =
-            currentUser.name;
-    }
-
-
-    if (roleElement) {
-        roleElement.textContent =
-            currentUser.role;
-    }
-
-
-    if (avatarElement) {
-        avatarElement.textContent =
-            currentUser.name
-                .charAt(0)
-                .toUpperCase();
-    }
-
-
-    setText(
-        "profileName",
-        currentUser.name
-    );
-
-    setText(
-        "profileEmail",
-        currentUser.email
-    );
-
-    setText(
-        "profileRole",
-        currentUser.role
-    );
-
-    setText(
-        "profileEmployeeId",
-        currentUser.employeeId || "ADMIN001"
-    );
-
-}
-
-
-// ==========================================================
-// ROLE NAVIGATION
-// ==========================================================
-
-function setupRoleNavigation() {
-
-    const navigation =
-        document.getElementById(
-            "mainNavigation"
-        );
-
-
-    if (!navigation || !currentUser) {
-        return;
-    }
-
-
-    const existingDynamic =
-        navigation.querySelectorAll(
-            ".dynamic-nav-button"
-        );
-
-
-    existingDynamic.forEach(
-        function (button) {
-            button.remove();
-        }
-    );
-
-
-    if (currentUser.type === "employee") {
-
-        const leaveButton =
-            createNavButton(
-                "myLeave",
-                "📅 My Leave"
-            );
-
-        const resignationButton =
-            createNavButton(
-                "myResignation",
-                "📄 My Resignation"
-            );
-
-
-        const dashboardButton =
-            navigation.querySelector(
-                '[data-page="dashboard"]'
-            );
-
-
-        if (dashboardButton) {
-
-            dashboardButton.after(
-                leaveButton,
-                resignationButton
-            );
-
-        }
-
-    }
-
-}
-
-
-// ==========================================================
-// CREATE NAV BUTTON
-// ==========================================================
-
-function createNavButton(
-    page,
-    text
-) {
-
-    const button =
-        document.createElement("button");
-
-    button.type = "button";
-
-    button.dataset.page = page;
-
-    button.textContent = text;
-
-    button.className =
-        "dynamic-nav-button";
-
-
-    button.addEventListener(
-        "click",
-        function () {
-
-            showPage(page);
-
-        }
-    );
-
-
-    return button;
-
-}
-
-
-// ==========================================================
-// PAGE NAVIGATION
-// ==========================================================
-
-const navigationButtons =
-    document.querySelectorAll(
-        ".sidebar button[data-page]"
-    );
-
-
-navigationButtons.forEach(
-    function (button) {
-
-        button.addEventListener(
-            "click",
-            function () {
-
-                showPage(
-                    button.dataset.page
-                );
-
-            }
-        );
-
-    }
-);
-
-
-function showPage(pageName) {
-
-    const pages = [
-        "dashboard",
-        "employees",
-        "addEmployee",
-        "departments",
-        "leaveRequests",
-        "resignationRequests",
-        "attendance",
-        "reports",
-        "profile",
-        "myLeave",
-        "myResignation"
-    ];
-
-
-    pages.forEach(
-        function (page) {
-
-            const element =
-                document.getElementById(
-                    page + "Page"
-                );
-
-
-            if (element) {
-
-                element.classList.add(
-                    "hidden"
-                );
-
-            }
-
-        }
-    );
-
-
-    const selected =
-        document.getElementById(
-            pageName + "Page"
-        );
-
-
-    if (!selected) {
-        return;
-    }
-
-
-    // Employee permission control
+    /* ADMIN LOGIN */
 
     if (
-        currentUser &&
-        currentUser.type === "employee"
+        username === DEFAULT_ADMIN.username &&
+        password === DEFAULT_ADMIN.password
     ) {
 
-        const employeeAllowedPages = [
-            "dashboard",
+        state.currentUser = {
+            type: "admin",
+            username: DEFAULT_ADMIN.username,
+            name: DEFAULT_ADMIN.name,
+            role: DEFAULT_ADMIN.role,
+            email: DEFAULT_ADMIN.email,
+            employeeId: DEFAULT_ADMIN.employeeId
+        };
+
+        saveState();
+
+        showApplication();
+
+        return true;
+    }
+
+    /* EMPLOYEE LOGIN */
+
+    const employee = state.employees.find(emp =>
+        (
+            emp.id.toLowerCase() === username.toLowerCase() ||
+            emp.email.toLowerCase() === username.toLowerCase()
+        ) &&
+        emp.password === password
+    );
+
+    if (employee) {
+
+        if (employee.status === "Terminated") {
+            showMessage(
+                "This employee account is terminated.",
+                "error"
+            );
+
+            return false;
+        }
+
+        state.currentUser = {
+            type: "employee",
+            username: employee.id,
+            name: employee.name,
+            role: employee.role,
+            email: employee.email,
+            employeeId: employee.id
+        };
+
+        saveState();
+
+        showApplication();
+
+        return true;
+    }
+
+    return false;
+}
+
+function logout() {
+
+    state.currentUser = null;
+
+    saveState();
+
+    $("appPage").classList.add("hidden");
+    $("loginPage").classList.remove("hidden");
+
+    $("loginForm").reset();
+
+    $("loginError").textContent = "";
+
+    showMessage("Logged out successfully.");
+}
+
+function showApplication() {
+
+    $("loginPage").classList.add("hidden");
+    $("appPage").classList.remove("hidden");
+
+    setupUserInterface();
+
+    if (state.currentUser.type === "admin") {
+        navigateTo("dashboard");
+    } else {
+        navigateTo("myLeave");
+    }
+
+    refreshAll();
+}
+
+
+/* =========================================================
+   USER INTERFACE
+   ========================================================= */
+
+function setupUserInterface() {
+
+    const user = state.currentUser;
+
+    if (!user) return;
+
+    const avatar = $("currentUserAvatar");
+    const name = $("currentUserName");
+    const role = $("currentUserRole");
+
+    if (avatar) {
+        avatar.textContent = getInitials(user.name);
+    }
+
+    if (name) {
+        name.textContent = user.name;
+    }
+
+    if (role) {
+        role.textContent = user.role;
+    }
+
+    updateProfile();
+
+    setupEmployeeNavigation();
+}
+
+function setupEmployeeNavigation() {
+
+    const navigation = $("mainNavigation");
+
+    if (!navigation) return;
+
+    const buttons = navigation.querySelectorAll("button[data-page]");
+
+    buttons.forEach(button => {
+
+        const page = button.dataset.page;
+
+        /* Employee should not access admin pages */
+
+        if (
+            state.currentUser &&
+            state.currentUser.type === "employee"
+        ) {
+
+            const allowed = [
+                "profile",
+                "attendance",
+                "myLeave",
+                "myResignation"
+            ];
+
+            if (!allowed.includes(page)) {
+                button.style.display = "none";
+            } else {
+                button.style.display = "";
+            }
+
+        } else {
+
+            button.style.display = "";
+
+            if (page === "myLeave" || page === "myResignation") {
+                button.style.display = "none";
+            }
+        }
+    });
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+const pageTitles = {
+    dashboard: ["Dashboard", "Employee Management Portal"],
+    employees: ["Employees", "View and manage all employee records."],
+    addEmployee: ["Add New Employee", "Create a new employee record."],
+    departments: ["Departments", "Manage company departments."],
+    leaveRequests: ["Leave Requests", "Review and manage employee leave requests."],
+    resignationRequests: ["Termination Requests", "Review employee termination requests."],
+    attendance: ["Attendance", "Track employee attendance and working status."],
+    reports: ["Reports", "Workforce and employee management reports."],
+    profile: ["My Profile", "View your account and employment information."],
+    myLeave: ["My Leave", "Apply for leave and view your leave history."],
+    myResignation: ["My Termination", "Submit a termination request for Admin approval."]
+};
+
+function navigateTo(page) {
+
+    if (!state.currentUser) return;
+
+    /* Permission control */
+
+    if (state.currentUser.type === "employee") {
+
+        const allowed = [
             "myLeave",
             "myResignation",
             "attendance",
             "profile"
         ];
 
+        if (!allowed.includes(page)) {
+            page = "myLeave";
+        }
+    }
 
-        if (
-            !employeeAllowedPages.includes(
-                pageName
-            )
-        ) {
+    document.querySelectorAll(".page").forEach(section => {
+        section.classList.add("hidden");
+    });
 
-            alert(
-                "You do not have permission to access this section."
+    const target = $(`${page}Page`);
+
+    if (target) {
+        target.classList.remove("hidden");
+    }
+
+    const title = pageTitles[page];
+
+    if (title) {
+        $("pageTitle").textContent = title[0];
+        $("pageSubtitle").textContent = title[1];
+    }
+
+    document.querySelectorAll("#mainNavigation button[data-page]")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            );
+        });
+
+    refreshAll();
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function updateDashboard() {
+
+    const employees = state.employees;
+
+    const total = employees.length;
+
+    const active = employees.filter(
+        e => e.status === "Active"
+    ).length;
+
+    const onLeave = employees.filter(
+        e => e.status === "On Leave"
+    ).length;
+
+    const resigned = employees.filter(
+        e => e.status === "Terminated"
+    ).length;
+
+    const pendingLeaves = state.leaveRequests.filter(
+        r => r.status === "Pending"
+    ).length;
+
+    const pendingTerminations = state.resignationRequests.filter(
+        r => r.status === "Pending"
+    ).length;
+
+    const currentYear = new Date().getFullYear();
+
+    const newJoiners = employees.filter(e => {
+        return (
+            e.joiningDate &&
+            new Date(e.joiningDate).getFullYear() === currentYear
+        );
+    }).length;
+
+    const rejoined = employees.filter(
+        e => e.previousJoiningDates &&
+            e.previousJoiningDates.length > 0
+    ).length;
+
+    setText("totalEmployees", total);
+    setText("activeEmployees", active);
+    setText("onLeaveEmployees", onLeave);
+    setText("pendingLeaveRequests", pendingLeaves);
+
+    setText("pendingResignations", pendingTerminations);
+    setText("resignedEmployees", resigned);
+
+    setText("newJoiners", newJoiners);
+    setText("rejoinedEmployees", rejoined);
+
+    setText(
+        "totalDepartments",
+        state.departments.filter(
+            d => d.status === "Active"
+        ).length
+    );
+
+    renderDepartmentDistribution();
+    renderJoiningTrend();
+    renderRecentEmployees();
+    renderAlerts();
+}
+
+function setText(id, value) {
+
+    const element = $(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+
+/* =========================================================
+   DEPARTMENT DISTRIBUTION
+   ========================================================= */
+
+function renderDepartmentDistribution() {
+
+    const container = $("departmentDistribution");
+
+    if (!container) return;
+
+    const counts = {};
+
+    state.departments.forEach(dep => {
+        counts[dep.name] = 0;
+    });
+
+    state.employees.forEach(employee => {
+
+        if (employee.status !== "Terminated") {
+
+            counts[employee.department] =
+                (counts[employee.department] || 0) + 1;
+        }
+    });
+
+    const total = Object.values(counts)
+        .reduce((sum, value) => sum + value, 0);
+
+    container.innerHTML = Object.entries(counts)
+        .map(([department, count]) => {
+
+            const percentage =
+                total > 0
+                    ? Math.round((count / total) * 100)
+                    : 0;
+
+            return `
+                <div style="margin-bottom:14px;">
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom:5px;
+                    ">
+                        <span>${escapeHTML(department)}</span>
+                        <strong>${count}</strong>
+                    </div>
+
+                    <div style="
+                        background:#e5e7eb;
+                        height:8px;
+                        border-radius:20px;
+                        overflow:hidden;
+                    ">
+                        <div style="
+                            width:${percentage}%;
+                            height:100%;
+                            background:#2563eb;
+                        "></div>
+                    </div>
+                </div>
+            `;
+        })
+        .join("");
+}
+
+
+/* =========================================================
+   JOINING VS TERMINATION
+   ========================================================= */
+
+function renderJoiningTrend() {
+
+    const container = $("joiningResignationTrend");
+
+    if (!container) return;
+
+    const currentYear = new Date().getFullYear();
+
+    let html = "";
+
+    for (let month = 0; month < 12; month++) {
+
+        const joiningCount = state.employees.filter(emp => {
+
+            const date = new Date(emp.joiningDate);
+
+            return (
+                date.getFullYear() === currentYear &&
+                date.getMonth() === month
+            );
+        }).length;
+
+        const terminationCount =
+            state.resignationRequests.filter(req => {
+
+                if (!req.requestedDate) return false;
+
+                const date = new Date(req.requestedDate);
+
+                return (
+                    date.getFullYear() === currentYear &&
+                    date.getMonth() === month &&
+                    req.status === "Approved"
+                );
+            }).length;
+
+        const monthName = new Date(
+            currentYear,
+            month,
+            1
+        ).toLocaleDateString("en-IN", {
+            month: "short"
+        });
+
+        html += `
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                padding:8px 0;
+                border-bottom:1px solid #eee;
+            ">
+                <strong>${monthName}</strong>
+                <span>
+                    Joined: <b>${joiningCount}</b>
+                    &nbsp; | &nbsp;
+                    Terminated: <b>${terminationCount}</b>
+                </span>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+
+/* =========================================================
+   RECENT EMPLOYEES
+   ========================================================= */
+
+function renderRecentEmployees() {
+
+    const tbody = $("recentEmployees");
+
+    if (!tbody) return;
+
+    const employees = [...state.employees]
+        .sort((a, b) =>
+            new Date(b.joiningDate) -
+            new Date(a.joiningDate)
+        )
+        .slice(0, 10);
+
+    tbody.innerHTML = employees.map(employee => `
+        <tr>
+            <td>${escapeHTML(employee.id)}</td>
+
+            <td>${escapeHTML(employee.name)}</td>
+
+            <td>${escapeHTML(employee.department)}</td>
+
+            <td>${formatDate(employee.joiningDate)}</td>
+
+            <td>
+                <span class="status ${employee.status
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}">
+                    ${escapeHTML(employee.status)}
+                </span>
+            </td>
+        </tr>
+    `).join("");
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+function renderAlerts() {
+
+    const container = $("dashboardAlerts");
+
+    if (!container) return;
+
+    const alerts = [];
+
+    const pendingLeaves = state.leaveRequests.filter(
+        r => r.status === "Pending"
+    );
+
+    const pendingTerminations =
+        state.resignationRequests.filter(
+            r => r.status === "Pending"
+        );
+
+    pendingLeaves.slice(0, 3).forEach(request => {
+
+        alerts.push({
+            text: `${request.employeeName} submitted a leave request.`,
+            type: "Leave"
+        });
+    });
+
+    pendingTerminations.slice(0, 3).forEach(request => {
+
+        alerts.push({
+            text: `${request.employeeName} submitted a termination request.`,
+            type: "Termination"
+        });
+    });
+
+    if (alerts.length === 0) {
+
+        container.innerHTML = `
+            <div class="alert-item">
+                <span>●</span>
+                <p>No new alerts.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = alerts.map(alert => `
+        <div class="alert-item">
+            <span>●</span>
+            <p>
+                <strong>${escapeHTML(alert.type)}:</strong>
+                ${escapeHTML(alert.text)}
+            </p>
+        </div>
+    `).join("");
+}
+
+
+/* =========================================================
+   EMPLOYEE DIRECTORY
+   ========================================================= */
+
+function renderEmployees(search = "") {
+
+    const tbody = $("employeeTable");
+
+    if (!tbody) return;
+
+    search = search.toLowerCase().trim();
+
+    const employees = state.employees.filter(employee => {
+
+        if (!search) return true;
+
+        return [
+            employee.id,
+            employee.name,
+            employee.email,
+            employee.department,
+            employee.role,
+            employee.status
+        ]
+            .join(" ")
+            .toLowerCase()
+            .includes(search);
+    });
+
+    tbody.innerHTML = employees.map(employee => {
+
+        const isTerminated =
+            employee.status === "Terminated";
+
+        const actionButton = isTerminated
+            ? `
+                <button
+                    type="button"
+                    class="rejoin-btn"
+                    data-id="${employee.id}"
+                >
+                    Rejoin
+                </button>
+            `
+            : `
+                <button
+                    type="button"
+                    class="view-employee-btn"
+                    data-id="${employee.id}"
+                >
+                    View
+                </button>
+
+                <button
+                    type="button"
+                    class="terminate-btn"
+                    data-id="${employee.id}"
+                >
+                    Terminate
+                </button>
+            `;
+
+        return `
+            <tr>
+
+                <td>${escapeHTML(employee.id)}</td>
+
+                <td>${escapeHTML(employee.name)}</td>
+
+                <td>${escapeHTML(employee.email)}</td>
+
+                <td>${escapeHTML(employee.department)}</td>
+
+                <td>${escapeHTML(employee.role)}</td>
+
+                <td>
+                    <span class="status">
+                        ${escapeHTML(employee.status)}
+                    </span>
+                </td>
+
+                <td>
+                    ${actionButton}
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+    bindEmployeeActionButtons();
+}
+
+function bindEmployeeActionButtons() {
+
+    document.querySelectorAll(".terminate-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+                terminateEmployee(button.dataset.id);
+            };
+        });
+
+    document.querySelectorAll(".rejoin-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+                rejoinEmployee(button.dataset.id);
+            };
+        });
+
+    document.querySelectorAll(".view-employee-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+                viewEmployee(button.dataset.id);
+            };
+        });
+}
+
+
+/* =========================================================
+   VIEW EMPLOYEE
+   ========================================================= */
+
+function viewEmployee(employeeId) {
+
+    const employee = state.employees.find(
+        e => e.id === employeeId
+    );
+
+    if (!employee) return;
+
+    alert(
+        `Employee Details\n\n` +
+        `ID: ${employee.id}\n` +
+        `Name: ${employee.name}\n` +
+        `Email: ${employee.email}\n` +
+        `Phone: ${employee.phone}\n` +
+        `Department: ${employee.department}\n` +
+        `Role: ${employee.role}\n` +
+        `Joining Date: ${formatDate(employee.joiningDate)}\n` +
+        `Status: ${employee.status}`
+    );
+}
+
+
+/* =========================================================
+   TERMINATE EMPLOYEE
+   ========================================================= */
+
+function terminateEmployee(employeeId) {
+
+    const employee = state.employees.find(
+        e => e.id === employeeId
+    );
+
+    if (!employee) return;
+
+    if (employee.status === "Terminated") {
+        showMessage(
+            "Employee is already terminated.",
+            "error"
+        );
+        return;
+    }
+
+    const reason = prompt(
+        `Terminate ${employee.name}\n\nEnter termination reason:`
+    );
+
+    if (reason === null) return;
+
+    if (!reason.trim()) {
+
+        showMessage(
+            "Termination reason is required.",
+            "error"
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+        `Are you sure you want to terminate ${employee.name}?`
+    );
+
+    if (!confirmed) return;
+
+    employee.status = "Terminated";
+    employee.terminationDate = today();
+    employee.terminationReason = reason.trim();
+
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message: `${employee.name} has been terminated.`,
+        date: today(),
+        read: false
+    });
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        `${employee.name} terminated successfully.`
+    );
+}
+
+
+/* =========================================================
+   REJOIN EMPLOYEE
+   ========================================================= */
+
+function rejoinEmployee(employeeId) {
+
+    const employee = state.employees.find(
+        e => e.id === employeeId
+    );
+
+    if (!employee) return;
+
+    if (employee.status !== "Terminated") {
+        showMessage(
+            "Employee is not terminated.",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        `Rejoin ${employee.name} as an employee?`
+    );
+
+    if (!confirmed) return;
+
+    if (!employee.previousJoiningDates) {
+        employee.previousJoiningDates = [];
+    }
+
+    if (employee.joiningDate) {
+        employee.previousJoiningDates.push(
+            employee.joiningDate
+        );
+    }
+
+    employee.joiningDate = today();
+    employee.status = "Active";
+    employee.terminationDate = null;
+    employee.terminationReason = null;
+
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message: `${employee.name} has rejoined the organization.`,
+        date: today(),
+        read: false
+    });
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        `${employee.name} rejoined successfully.`
+    );
+}
+
+
+/* =========================================================
+   ADD EMPLOYEE
+   ========================================================= */
+
+function addEmployee(event) {
+
+    event.preventDefault();
+
+    const name = $("employeeName").value.trim();
+    const email = $("employeeEmail").value.trim();
+    const phone = $("employeePhone").value.trim();
+    const department = $("employeeDepartment").value;
+    const role = $("employeeRole").value.trim();
+    const joiningDate = $("joiningDate").value;
+    const status = $("employeeStatus").value;
+
+    if (
+        !name ||
+        !email ||
+        !department ||
+        !role ||
+        !joiningDate
+    ) {
+
+        showMessage(
+            "Please complete all required fields.",
+            "error"
+        );
+
+        return;
+    }
+
+    const existingEmail = state.employees.find(
+        employee =>
+            employee.email.toLowerCase() ===
+            email.toLowerCase()
+    );
+
+    if (existingEmail) {
+
+        showMessage(
+            "Email already exists.",
+            "error"
+        );
+
+        return;
+    }
+
+    const nextNumber =
+        state.employees.reduce((max, employee) => {
+
+            const number = parseInt(
+                employee.id.replace(/\D/g, ""),
+                10
             );
 
-            showPage("dashboard");
+            return Math.max(max, number || 0);
 
-            return;
+        }, 0) + 1;
 
-        }
+    const employeeId =
+        generateId("EMP", nextNumber);
 
-    }
+    const newEmployee = {
 
+        id: employeeId,
 
-    selected.classList.remove("hidden");
+        name,
 
-    updatePageTitle(pageName);
+        email,
 
+        phone,
 
-    if (pageName === "dashboard") {
-        updateDashboard();
-    }
+        department,
 
-    if (pageName === "employees") {
-        renderEmployees();
-    }
+        role,
 
-    if (pageName === "addEmployee") {
-        populateDepartmentDropdown();
-    }
+        joiningDate,
 
-    if (pageName === "departments") {
-        renderDepartments();
-    }
+        status,
 
-    if (pageName === "leaveRequests") {
-        renderLeaveRequests();
-    }
+        password: "emp123",
 
-    if (pageName === "resignationRequests") {
-        renderResignationRequests();
-    }
+        terminationDate: null,
 
-    if (pageName === "attendance") {
-        renderAttendance();
-    }
+        terminationReason: null,
 
-    if (pageName === "reports") {
-        updateReports();
-    }
-
-    if (pageName === "myLeave") {
-        renderMyLeave();
-    }
-
-    if (pageName === "myResignation") {
-        renderMyResignation();
-    }
-
-}
-
-
-// ==========================================================
-// PAGE TITLE
-// ==========================================================
-
-function updatePageTitle(pageName) {
-
-    const title =
-        document.getElementById(
-            "pageTitle"
-        );
-
-    const subtitle =
-        document.getElementById(
-            "pageSubtitle"
-        );
-
-
-    const titles = {
-
-        dashboard: [
-            "Dashboard",
-            "Workforce overview"
-        ],
-
-        employees: [
-            "Employees",
-            "Employee directory"
-        ],
-
-        addEmployee: [
-            "Add Employee",
-            "Create employee record"
-        ],
-
-        departments: [
-            "Departments",
-            "Company departments"
-        ],
-
-        leaveRequests: [
-            "Leave Requests",
-            "Admin approval center"
-        ],
-
-        resignationRequests: [
-            "Resignation Requests",
-            "Employee exit approval center"
-        ],
-
-        attendance: [
-            "Attendance",
-            "Daily attendance"
-        ],
-
-        reports: [
-            "Reports",
-            "Workforce reports"
-        ],
-
-        profile: [
-            "My Profile",
-            "Account information"
-        ],
-
-        myLeave: [
-            "My Leave",
-            "Leave management"
-        ],
-
-        myResignation: [
-            "My Resignation",
-            "Resignation request"
-        ]
-
+        previousJoiningDates: []
     };
 
+    state.employees.push(newEmployee);
 
-    if (titles[pageName]) {
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message: `${name} joined as a new employee.`,
+        date: today(),
+        read: false
+    });
 
-        if (title) {
-            title.textContent =
-                titles[pageName][0];
-        }
+    saveState();
 
-        if (subtitle) {
-            subtitle.textContent =
-                titles[pageName][1];
-        }
+    event.target.reset();
 
-    }
+    populateDepartmentSelect();
 
+    refreshAll();
+
+    showMessage(
+        `Employee added successfully. Employee ID: ${employeeId}`
+    );
+
+    navigateTo("employees");
 }
 
 
-// ==========================================================
-// UPDATE ALL
-// ==========================================================
+/* =========================================================
+   DEPARTMENT MANAGEMENT
+   ========================================================= */
 
-function updateAll() {
+function renderDepartments() {
 
-    saveAllData();
+    const tbody = $("departmentTable");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = state.departments.map(department => {
+
+        const employeeCount =
+            state.employees.filter(
+                employee =>
+                    employee.department === department.name &&
+                    employee.status !== "Terminated"
+            ).length;
+
+        return `
+            <tr>
+
+                <td>${escapeHTML(department.id)}</td>
+
+                <td>${escapeHTML(department.name)}</td>
+
+                <td>${employeeCount}</td>
+
+                <td>${escapeHTML(department.status)}</td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="department-toggle-btn"
+                        data-id="${department.id}"
+                    >
+                        ${
+                            department.status === "Active"
+                                ? "Deactivate"
+                                : "Activate"
+                        }
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+    document.querySelectorAll(".department-toggle-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+
+                const department =
+                    state.departments.find(
+                        d => d.id === button.dataset.id
+                    );
+
+                if (!department) return;
+
+                department.status =
+                    department.status === "Active"
+                        ? "Inactive"
+                        : "Active";
+
+                saveState();
+
+                refreshAll();
+
+                showMessage(
+                    `${department.name} status updated.`
+                );
+            };
+        });
+}
+
+function addDepartment() {
+
+    const name = prompt(
+        "Enter new department name:"
+    );
+
+    if (name === null) return;
+
+    const cleanName = name.trim();
+
+    if (!cleanName) {
+
+        showMessage(
+            "Department name is required.",
+            "error"
+        );
+
+        return;
+    }
+
+    const exists = state.departments.some(
+        department =>
+            department.name.toLowerCase() ===
+            cleanName.toLowerCase()
+    );
+
+    if (exists) {
+
+        showMessage(
+            "Department already exists.",
+            "error"
+        );
+
+        return;
+    }
+
+    const id =
+        `DEP${String(state.departments.length + 1).padStart(3, "0")}`;
+
+    state.departments.push({
+        id,
+        name: cleanName,
+        status: "Active"
+    });
+
+    saveState();
+
+    populateDepartmentSelect();
+    refreshAll();
+
+    showMessage(
+        `${cleanName} department added.`
+    );
+}
+
+function populateDepartmentSelect() {
+
+    const select = $("employeeDepartment");
+
+    if (!select) return;
+
+    select.innerHTML = `
+        <option value="">
+            Select Department
+        </option>
+    `;
+
+    state.departments
+        .filter(d => d.status === "Active")
+        .forEach(department => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = department.name;
+            option.textContent = department.name;
+
+            select.appendChild(option);
+        });
+}
+
+
+/* =========================================================
+   LEAVE REQUESTS - ADMIN
+   ========================================================= */
+
+function renderLeaveRequests() {
+
+    const tbody = $("leaveRequestTable");
+
+    if (!tbody) return;
+
+    const pending =
+        state.leaveRequests.filter(
+            r => r.status === "Pending"
+        ).length;
+
+    const approved =
+        state.leaveRequests.filter(
+            r => r.status === "Approved"
+        ).length;
+
+    const rejected =
+        state.leaveRequests.filter(
+            r => r.status === "Rejected"
+        ).length;
+
+    setText("leavePendingCount", pending);
+    setText("leaveApprovedCount", approved);
+    setText("leaveRejectedCount", rejected);
+
+    tbody.innerHTML =
+        state.leaveRequests.map(request => {
+
+            let actions = "";
+
+            if (request.status === "Pending") {
+
+                actions = `
+                    <button
+                        type="button"
+                        class="approve-leave-btn"
+                        data-id="${request.id}"
+                    >
+                        Approve
+                    </button>
+
+                    <button
+                        type="button"
+                        class="reject-leave-btn"
+                        data-id="${request.id}"
+                    >
+                        Reject
+                    </button>
+                `;
+            } else {
+
+                actions = `
+                    <span>
+                        ${escapeHTML(request.status)}
+                    </span>
+                `;
+            }
+
+            return `
+                <tr>
+
+                    <td>${escapeHTML(request.id)}</td>
+
+                    <td>${escapeHTML(request.employeeName)}</td>
+
+                    <td>${escapeHTML(request.leaveType)}</td>
+
+                    <td>${formatDate(request.fromDate)}</td>
+
+                    <td>${formatDate(request.toDate)}</td>
+
+                    <td>${escapeHTML(request.reason)}</td>
+
+                    <td>${escapeHTML(request.status)}</td>
+
+                    <td>${actions}</td>
+
+                </tr>
+            `;
+        }).join("");
+
+    bindLeaveButtons();
+}
+
+function bindLeaveButtons() {
+
+    document.querySelectorAll(".approve-leave-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+
+                updateLeaveStatus(
+                    button.dataset.id,
+                    "Approved"
+                );
+            };
+        });
+
+    document.querySelectorAll(".reject-leave-btn")
+        .forEach(button => {
+
+            button.onclick = () => {
+
+                updateLeaveStatus(
+                    button.dataset.id,
+                    "Rejected"
+                );
+            };
+        });
+}
+
+function updateLeaveStatus(requestId, status) {
+
+    const request =
+        state.leaveRequests.find(
+            r => r.id === requestId
+        );
+
+    if (!request) return;
+
+    if (request.status !== "Pending") {
+
+        showMessage(
+            "This request has already been processed.",
+            "error"
+        );
+
+        return;
+    }
+
+    request.status = status;
+    request.actionDate = today();
+    request.actionBy =
+        state.currentUser?.name || "Admin";
+
+    const employee =
+        state.employees.find(
+            e => e.id === request.employeeId
+        );
+
+    if (status === "Approved" && employee) {
+        employee.status = "On Leave";
+    }
+
+    if (status === "Rejected" && employee) {
+
+        if (employee.status === "On Leave") {
+            employee.status = "Active";
+        }
+    }
+
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message:
+            `Leave request ${request.id} for ${request.employeeName} was ${status.toLowerCase()}.`,
+        date: today(),
+        read: false
+    });
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        `Leave request ${status.toLowerCase()} successfully.`
+    );
+}
+
+
+/* =========================================================
+   EMPLOYEE - APPLY LEAVE
+   ========================================================= */
+
+function applyLeaveForEmployee() {
+
+    if (
+        !state.currentUser ||
+        state.currentUser.type !== "employee"
+    ) {
+        return;
+    }
+
+    const employeeId =
+        state.currentUser.employeeId;
+
+    const employee =
+        state.employees.find(
+            e => e.id === employeeId
+        );
+
+    if (!employee) return;
+
+    const leaveType = prompt(
+        "Leave Type:\n\nEnter Casual / Sick / Earned / Emergency"
+    );
+
+    if (leaveType === null) return;
+
+    const fromDate = prompt(
+        "Leave From Date (YYYY-MM-DD):"
+    );
+
+    if (fromDate === null) return;
+
+    const toDate = prompt(
+        "Leave To Date (YYYY-MM-DD):"
+    );
+
+    if (toDate === null) return;
+
+    const reason = prompt(
+        "Enter Leave Reason:"
+    );
+
+    if (reason === null) return;
+
+    if (
+        !leaveType.trim() ||
+        !fromDate.trim() ||
+        !toDate.trim() ||
+        !reason.trim()
+    ) {
+
+        showMessage(
+            "Leave type, dates and reason are required.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (fromDate > toDate) {
+
+        showMessage(
+            "From date cannot be after To date.",
+            "error"
+        );
+
+        return;
+    }
+
+    const pendingRequest =
+        state.leaveRequests.find(
+            request =>
+                request.employeeId === employeeId &&
+                request.status === "Pending"
+        );
+
+    if (pendingRequest) {
+
+        showMessage(
+            "You already have a pending leave request.",
+            "error"
+        );
+
+        return;
+    }
+
+    const requestId =
+        `LR${Date.now().toString().slice(-8)}`;
+
+    state.leaveRequests.unshift({
+
+        id: requestId,
+
+        employeeId,
+
+        employeeName: employee.name,
+
+        department: employee.department,
+
+        leaveType: leaveType.trim(),
+
+        fromDate: fromDate.trim(),
+
+        toDate: toDate.trim(),
+
+        reason: reason.trim(),
+
+        status: "Pending",
+
+        requestedDate: today(),
+
+        actionDate: null,
+
+        actionBy: null
+    });
+
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message:
+            `${employee.name} submitted a leave request.`,
+        date: today(),
+        read: false
+    });
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        "Leave request submitted successfully."
+    );
+}
+
+
+/* =========================================================
+   MY LEAVE
+   ========================================================= */
+
+function renderMyLeave() {
+
+    if (
+        !state.currentUser ||
+        state.currentUser.type !== "employee"
+    ) return;
+
+    const employeeId =
+        state.currentUser.employeeId;
+
+    const requests =
+        state.leaveRequests.filter(
+            request =>
+                request.employeeId === employeeId
+        );
+
+    const pending =
+        requests.filter(
+            r => r.status === "Pending"
+        ).length;
+
+    const approved =
+        requests.filter(
+            r => r.status === "Approved"
+        ).length;
+
+    setText("leaveBalance", 12 - approved);
+    setText("myPendingLeaves", pending);
+    setText("myApprovedLeaves", approved);
+
+    const tbody = $("myLeaveTable");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = requests.map(request => `
+        <tr>
+
+            <td>${escapeHTML(request.id)}</td>
+
+            <td>${escapeHTML(request.leaveType)}</td>
+
+            <td>${formatDate(request.fromDate)}</td>
+
+            <td>${formatDate(request.toDate)}</td>
+
+            <td>${escapeHTML(request.reason)}</td>
+
+            <td>${escapeHTML(request.status)}</td>
+
+        </tr>
+    `).join("");
+}
+
+
+/* =========================================================
+   TERMINATION REQUESTS
+   ========================================================= */
+
+function renderResignationRequests() {
+
+    const tbody =
+        $("resignationRequestTable");
+
+    if (!tbody) return;
+
+    const pending =
+        state.resignationRequests.filter(
+            r => r.status === "Pending"
+        ).length;
+
+    const approved =
+        state.resignationRequests.filter(
+            r => r.status === "Approved"
+        ).length;
+
+    const rejected =
+        state.resignationRequests.filter(
+            r => r.status === "Rejected"
+        ).length;
+
+    setText(
+        "resignationPendingCount",
+        pending
+    );
+
+    setText(
+        "resignationApprovedCount",
+        approved
+    );
+
+    setText(
+        "resignationRejectedCount",
+        rejected
+    );
+
+    tbody.innerHTML =
+        state.resignationRequests.map(request => {
+
+            let actions = "";
+
+            if (request.status === "Pending") {
+
+                actions = `
+                    <button
+                        type="button"
+                        class="approve-termination-btn"
+                        data-id="${request.id}"
+                    >
+                        Approve & Terminate
+                    </button>
+
+                    <button
+                        type="button"
+                        class="reject-termination-btn"
+                        data-id="${request.id}"
+                    >
+                        Reject
+                    </button>
+                `;
+            }
+
+            return `
+                <tr>
+
+                    <td>${escapeHTML(request.id)}</td>
+
+                    <td>${escapeHTML(request.employeeName)}</td>
+
+                    <td>${escapeHTML(request.department)}</td>
+
+                    <td>${formatDate(request.requestedDate)}</td>
+
+                    <td>${formatDate(request.lastWorkingDate)}</td>
+
+                    <td>${escapeHTML(request.reason)}</td>
+
+                    <td>${escapeHTML(request.status)}</td>
+
+                    <td>${actions}</td>
+
+                </tr>
+            `;
+        }).join("");
+
+    bindTerminationRequestButtons();
+}
+
+function bindTerminationRequestButtons() {
+
+    document.querySelectorAll(
+        ".approve-termination-btn"
+    ).forEach(button => {
+
+        button.onclick = () => {
+
+            processTerminationRequest(
+                button.dataset.id,
+                "Approved"
+            );
+        };
+    });
+
+    document.querySelectorAll(
+        ".reject-termination-btn"
+    ).forEach(button => {
+
+        button.onclick = () => {
+
+            processTerminationRequest(
+                button.dataset.id,
+                "Rejected"
+            );
+        };
+    });
+}
+
+function processTerminationRequest(
+    requestId,
+    status
+) {
+
+    const request =
+        state.resignationRequests.find(
+            r => r.id === requestId
+        );
+
+    if (!request) return;
+
+    if (request.status !== "Pending") return;
+
+    request.status = status;
+    request.actionDate = today();
+
+    const employee =
+        state.employees.find(
+            e => e.id === request.employeeId
+        );
+
+    if (
+        status === "Approved" &&
+        employee
+    ) {
+
+        employee.status = "Terminated";
+
+        employee.terminationDate =
+            request.lastWorkingDate || today();
+
+        employee.terminationReason =
+            request.reason;
+    }
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        status === "Approved"
+            ? "Employee terminated successfully."
+            : "Termination request rejected."
+    );
+}
+
+
+/* =========================================================
+   EMPLOYEE TERMINATION REQUEST
+   ========================================================= */
+
+function requestTermination() {
+
+    if (
+        !state.currentUser ||
+        state.currentUser.type !== "employee"
+    ) return;
+
+    const employeeId =
+        state.currentUser.employeeId;
+
+    const employee =
+        state.employees.find(
+            e => e.id === employeeId
+        );
+
+    if (!employee) return;
+
+    const existing =
+        state.resignationRequests.find(
+            request =>
+                request.employeeId === employeeId &&
+                request.status === "Pending"
+        );
+
+    if (existing) {
+
+        showMessage(
+            "You already have a pending termination request.",
+            "error"
+        );
+
+        return;
+    }
+
+    const lastWorkingDate =
+        prompt(
+            "Enter proposed last working date (YYYY-MM-DD):"
+        );
+
+    if (lastWorkingDate === null) return;
+
+    const reason =
+        prompt(
+            "Enter reason for termination request:"
+        );
+
+    if (reason === null) return;
+
+    if (
+        !lastWorkingDate.trim() ||
+        !reason.trim()
+    ) {
+
+        showMessage(
+            "Last working date and reason are required.",
+            "error"
+        );
+
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            "Submit termination request to Admin?"
+        );
+
+    if (!confirmed) return;
+
+    const requestId =
+        `TR${Date.now().toString().slice(-8)}`;
+
+    state.resignationRequests.unshift({
+
+        id: requestId,
+
+        employeeId,
+
+        employeeName: employee.name,
+
+        department: employee.department,
+
+        requestedDate: today(),
+
+        lastWorkingDate: lastWorkingDate.trim(),
+
+        reason: reason.trim(),
+
+        status: "Pending",
+
+        actionDate: null
+    });
+
+    state.notifications.unshift({
+        id: `NOT${Date.now()}`,
+        message:
+            `${employee.name} submitted a termination request.`,
+        date: today(),
+        read: false
+    });
+
+    saveState();
+
+    refreshAll();
+
+    showMessage(
+        "Termination request submitted to Admin."
+    );
+}
+
+
+/* =========================================================
+   MY TERMINATION STATUS
+   ========================================================= */
+
+function renderMyResignation() {
+
+    if (
+        !state.currentUser ||
+        state.currentUser.type !== "employee"
+    ) return;
+
+    const employeeId =
+        state.currentUser.employeeId;
+
+    const requests =
+        state.resignationRequests.filter(
+            request =>
+                request.employeeId === employeeId
+        );
+
+    const container =
+        $("resignationStatus");
+
+    if (!container) return;
+
+    if (requests.length === 0) {
+
+        container.innerHTML = `
+            <p>
+                No termination request submitted.
+            </p>
+        `;
+
+        return;
+    }
+
+    const request = requests[0];
+
+    container.innerHTML = `
+        <div>
+
+            <h3>
+                Termination Request: ${escapeHTML(request.id)}
+            </h3>
+
+            <p>
+                Requested Date:
+                ${formatDate(request.requestedDate)}
+            </p>
+
+            <p>
+                Last Working Date:
+                ${formatDate(request.lastWorkingDate)}
+            </p>
+
+            <p>
+                Reason:
+                ${escapeHTML(request.reason)}
+            </p>
+
+            <p>
+                Status:
+                <strong>
+                    ${escapeHTML(request.status)}
+                </strong>
+            </p>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   ATTENDANCE
+   ========================================================= */
+
+function createAttendanceData() {
+
+    const date = today();
+
+    state.attendance = state.employees
+        .filter(
+            employee =>
+                employee.status !== "Terminated"
+        )
+        .slice(0, 200)
+        .map((employee, index) => {
+
+            let status = "Present";
+
+            if (employee.status === "On Leave") {
+                status = "On Leave";
+            } else if (index % 17 === 0) {
+                status = "Absent";
+            }
+
+            return {
+
+                employeeId: employee.id,
+
+                employeeName: employee.name,
+
+                department: employee.department,
+
+                date,
+
+                checkIn:
+                    status === "Present"
+                        ? "09:00 AM"
+                        : "-",
+
+                checkOut:
+                    status === "Present"
+                        ? "06:00 PM"
+                        : "-",
+
+                status
+            };
+        });
+
+    saveState();
+}
+
+function renderAttendance() {
+
+    if (!state.attendance.length) {
+        createAttendanceData();
+    }
+
+    let records =
+        state.attendance;
+
+    if (
+        state.currentUser &&
+        state.currentUser.type === "employee"
+    ) {
+
+        records = records.filter(
+            record =>
+                record.employeeId ===
+                state.currentUser.employeeId
+        );
+    }
+
+    const present =
+        records.filter(
+            r => r.status === "Present"
+        ).length;
+
+    const absent =
+        records.filter(
+            r => r.status === "Absent"
+        ).length;
+
+    const leave =
+        records.filter(
+            r => r.status === "On Leave"
+        ).length;
+
+    setText("presentToday", present);
+    setText("absentToday", absent);
+    setText("attendanceOnLeave", leave);
+
+    const tbody =
+        $("attendanceTable");
+
+    if (!tbody) return;
+
+    tbody.innerHTML = records.map(record => `
+        <tr>
+
+            <td>${escapeHTML(record.employeeId)}</td>
+
+            <td>${escapeHTML(record.employeeName)}</td>
+
+            <td>${escapeHTML(record.department)}</td>
+
+            <td>${formatDate(record.date)}</td>
+
+            <td>${escapeHTML(record.checkIn)}</td>
+
+            <td>${escapeHTML(record.checkOut)}</td>
+
+            <td>${escapeHTML(record.status)}</td>
+
+        </tr>
+    `).join("");
+}
+
+
+/* =========================================================
+   REPORTS
+   ========================================================= */
+
+function renderReports() {
+
+    const employees =
+        state.employees;
+
+    setText(
+        "reportTotal",
+        employees.length
+    );
+
+    setText(
+        "reportActive",
+        employees.filter(
+            e => e.status === "Active"
+        ).length
+    );
+
+    setText(
+        "reportLeave",
+        employees.filter(
+            e => e.status === "On Leave"
+        ).length
+    );
+
+    setText(
+        "reportResigned",
+        employees.filter(
+            e => e.status === "Terminated"
+        ).length
+    );
+
+    const container =
+        $("employeeReport");
+
+    if (!container) return;
+
+    const departmentSummary = {};
+
+    employees.forEach(employee => {
+
+        departmentSummary[employee.department] =
+            (departmentSummary[employee.department] || 0) + 1;
+    });
+
+    container.innerHTML = `
+        <div>
+
+            <h3>Workforce Summary</h3>
+
+            <p>
+                Generated:
+                ${formatDate(today())}
+            </p>
+
+            <hr>
+
+            <h3>Department Summary</h3>
+
+            ${Object.entries(departmentSummary)
+                .map(([department, count]) => `
+                    <p>
+                        <strong>
+                            ${escapeHTML(department)}
+                        </strong>:
+                        ${count} employees
+                    </p>
+                `)
+                .join("")}
+
+        </div>
+    `;
+}
+
+function exportReport() {
+
+    const headers = [
+        "Employee ID",
+        "Name",
+        "Email",
+        "Phone",
+        "Department",
+        "Role",
+        "Joining Date",
+        "Status"
+    ];
+
+    const rows =
+        state.employees.map(employee => [
+            employee.id,
+            employee.name,
+            employee.email,
+            employee.phone,
+            employee.department,
+            employee.role,
+            employee.joiningDate,
+            employee.status
+        ]);
+
+    const csv = [
+        headers,
+        ...rows
+    ]
+        .map(row =>
+            row.map(value =>
+                `"${String(value ?? "")
+                    .replace(/"/g, '""')}"`
+            ).join(",")
+        )
+        .join("\n");
+
+    const blob =
+        new Blob([csv], {
+            type: "text/csv;charset=utf-8;"
+        });
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        `employee-report-${today()}.csv`;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+    showMessage(
+        "Employee report exported successfully."
+    );
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+function updateProfile() {
+
+    if (!state.currentUser) return;
+
+    const user = state.currentUser;
+
+    setText(
+        "profileName",
+        user.name
+    );
+
+    setText(
+        "profileEmail",
+        user.email
+    );
+
+    setText(
+        "profileRole",
+        user.role
+    );
+
+    setText(
+        "profileEmployeeId",
+        user.employeeId
+    );
+
+    const avatar =
+        document.querySelector(".profile-avatar");
+
+    if (avatar) {
+        avatar.textContent =
+            getInitials(user.name);
+    }
+}
+
+function editProfile() {
+
+    if (!state.currentUser) return;
+
+    const employee =
+        state.currentUser.type === "employee"
+            ? state.employees.find(
+                e =>
+                    e.id ===
+                    state.currentUser.employeeId
+            )
+            : null;
+
+    const newName =
+        prompt(
+            "Enter your name:",
+            state.currentUser.name
+        );
+
+    if (newName === null) return;
+
+    if (!newName.trim()) return;
+
+    state.currentUser.name =
+        newName.trim();
+
+    if (employee) {
+        employee.name =
+            newName.trim();
+    }
+
+    saveState();
+
+    setupUserInterface();
+
+    refreshAll();
+
+    showMessage(
+        "Profile updated successfully."
+    );
+}
+
+
+/* =========================================================
+   GLOBAL SEARCH
+   ========================================================= */
+
+function globalSearch(value) {
+
+    if (
+        !state.currentUser ||
+        state.currentUser.type !== "admin"
+    ) return;
+
+    const search = value.trim();
+
+    if (!search) return;
+
+    navigateTo("employees");
+
+    const employeeSearch =
+        $("employeeSearch");
+
+    if (employeeSearch) {
+        employeeSearch.value = search;
+    }
+
+    renderEmployees(search);
+}
+
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+function updateNotifications() {
+
+    const count =
+        state.notifications.filter(
+            notification =>
+                !notification.read
+        ).length;
+
+    setText(
+        "notificationCount",
+        count
+    );
+}
+
+function showNotifications() {
+
+    const notifications =
+        state.notifications.slice(0, 10);
+
+    if (!notifications.length) {
+
+        alert("No notifications.");
+
+        return;
+    }
+
+    alert(
+        notifications
+            .map(
+                notification =>
+                    `• ${notification.message}`
+            )
+            .join("\n")
+    );
+
+    state.notifications.forEach(
+        notification => {
+            notification.read = true;
+        }
+    );
+
+    saveState();
+
+    updateNotifications();
+}
+
+
+/* =========================================================
+   VIEW ALL EMPLOYEES
+   ========================================================= */
+
+function viewAllEmployees() {
+
+    navigateTo("employees");
+
+    const search =
+        $("employeeSearch");
+
+    if (search) {
+        search.value = "";
+    }
+
+    renderEmployees("");
+}
+
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+function toggleMenu() {
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    if (!sidebar) return;
+
+    sidebar.classList.toggle("open");
+}
+
+
+/* =========================================================
+   REFRESH EVERYTHING
+   ========================================================= */
+
+function refreshAll() {
 
     updateDashboard();
 
-    renderEmployees();
+    renderEmployees(
+        $("employeeSearch")?.value || ""
+    );
 
     renderDepartments();
 
@@ -798,4421 +2555,369 @@ function updateAll() {
 
     renderAttendance();
 
-    updateReports();
-
-    populateDepartmentDropdown();
-
-    updateNotifications();
+    renderReports();
 
     renderMyLeave();
 
     renderMyResignation();
 
+    updateProfile();
+
+    updateNotifications();
+
+    populateDepartmentSelect();
 }
 
 
-// ==========================================================
-// DASHBOARD
-// ==========================================================
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
 
-function updateDashboard() {
+function setupEventListeners() {
 
-    const total =
-        employees.length;
+    /* LOGIN */
 
+    const loginForm =
+        $("loginForm");
 
-    const active =
-        employees.filter(
-            function (employee) {
+    if (loginForm) {
 
-                return employee.status === "Active";
-
-            }
-        ).length;
-
-
-    const onLeave =
-        employees.filter(
-            function (employee) {
-
-                return employee.status === "On Leave";
-
-            }
-        ).length;
-
-
-    const resigned =
-        employees.filter(
-            function (employee) {
-
-                return employee.status === "Resigned";
-
-            }
-        ).length;
-
-
-    const pendingLeaves =
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status === "Pending";
-
-            }
-        ).length;
-
-
-    const pendingResignations =
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status === "Pending";
-
-            }
-        ).length;
-
-
-    const newJoiners =
-        getNewJoinersCount();
-
-
-    const rejoined =
-        employees.filter(
-            function (employee) {
-
-                return employee.rejoined === true;
-
-            }
-        ).length;
-
-
-    setText(
-        "totalEmployees",
-        total
-    );
-
-    setText(
-        "activeEmployees",
-        active
-    );
-
-    setText(
-        "onLeaveEmployees",
-        onLeave
-    );
-
-    setText(
-        "resignedEmployees",
-        resigned
-    );
-
-    setText(
-        "newJoiners",
-        newJoiners
-    );
-
-    setText(
-        "rejoinedEmployees",
-        rejoined
-    );
-
-    setText(
-        "totalDepartments",
-        departments.length
-    );
-
-    setText(
-        "pendingLeaveRequests",
-        pendingLeaves
-    );
-
-    setText(
-        "pendingResignations",
-        pendingResignations
-    );
-
-
-    renderRecentEmployees();
-
-    updateDashboardCharts();
-
-    renderDashboardAlerts();
-
-}
-
-
-// ==========================================================
-// NEW JOINERS
-// ==========================================================
-
-function getNewJoinersCount() {
-
-    const today =
-        new Date();
-
-
-    const thirtyDaysAgo =
-        new Date();
-
-
-    thirtyDaysAgo.setDate(
-        today.getDate() - 30
-    );
-
-
-    return employees.filter(
-        function (employee) {
-
-            const date =
-                new Date(
-                    employee.joiningDate
-                );
-
-
-            return date >= thirtyDaysAgo;
-
-        }
-    ).length;
-
-}
-
-
-// ==========================================================
-// RECENT EMPLOYEES
-// ==========================================================
-
-function renderRecentEmployees() {
-
-    const table =
-        document.getElementById(
-            "recentEmployees"
-        );
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    employees
-        .slice()
-        .sort(
-            function (a, b) {
-
-                return (
-                    new Date(b.joiningDate) -
-                    new Date(a.joiningDate)
-                );
-
-            }
-        )
-        .slice(0, 5)
-        .forEach(
-            function (employee) {
-
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>${employee.id}</td>
-
-                    <td>${employee.name}</td>
-
-                    <td>${employee.department}</td>
-
-                    <td>${employee.joiningDate}</td>
-
-                    <td>
-                        ${getStatusBadge(
-                            employee.status
-                        )}
-                    </td>
-
-                `;
-
-
-                table.appendChild(row);
-
-            }
-        );
-
-}
-
-
-// ==========================================================
-// STATUS BADGE
-// ==========================================================
-
-function getStatusBadge(status) {
-
-    return `
-        <span class="status-badge status-${String(
-            status
-        )
-            .toLowerCase()
-            .replace(/\s+/g, "-")}">
-            ${status}
-        </span>
-    `;
-
-}
-
-
-// ==========================================================
-// EMPLOYEES
-// ==========================================================
-
-function renderEmployees(
-    list = employees
-) {
-
-    const table =
-        document.getElementById(
-            "employeeTable"
-        );
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    if (list.length === 0) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="7"
-                    style="text-align:center;">
-                    No employees found
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
-
-
-    list.forEach(
-        function (employee) {
-
-            const row =
-                document.createElement("tr");
-
-
-            let actionButtons = "";
-
-
-            if (currentUser &&
-                currentUser.type === "admin") {
-
-                actionButtons += `
-
-                    <button
-                        type="button"
-                        onclick="editEmployee('${employee.id}')"
-                    >
-                        Edit
-                    </button>
-
-                `;
-
-
-                if (
-                    employee.status === "Resigned"
-                ) {
-
-                    actionButtons += `
-
-                        <button
-                            type="button"
-                            onclick="rejoinEmployee('${employee.id}')"
-                        >
-                            Rejoin
-                        </button>
-
-                    `;
-
-                } else {
-
-                    actionButtons += `
-
-                        <button
-                            type="button"
-                            onclick="startAdminResignation('${employee.id}')"
-                        >
-                            Resign
-                        </button>
-
-                    `;
-
-                }
-
-            } else {
-
-                actionButtons = `
-
-                    <button
-                        type="button"
-                        onclick="viewEmployee('${employee.id}')"
-                    >
-                        View
-                    </button>
-
-                `;
-
-            }
-
-
-            row.innerHTML = `
-
-                <td>${employee.id}</td>
-
-                <td>${employee.name}</td>
-
-                <td>${employee.email}</td>
-
-                <td>${employee.department}</td>
-
-                <td>${employee.role}</td>
-
-                <td>
-                    ${getStatusBadge(
-                        employee.status
-                    )}
-                </td>
-
-                <td>
-                    ${actionButtons}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// VIEW EMPLOYEE
-// ==========================================================
-
-function viewEmployee(id) {
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    openModal(
-        "Employee Details",
-        `
-
-        <div class="employee-details">
-
-            <p>
-                <strong>Employee ID:</strong>
-                ${employee.id}
-            </p>
-
-            <p>
-                <strong>Name:</strong>
-                ${employee.name}
-            </p>
-
-            <p>
-                <strong>Email:</strong>
-                ${employee.email}
-            </p>
-
-            <p>
-                <strong>Phone:</strong>
-                ${employee.phone || "-"}
-            </p>
-
-            <p>
-                <strong>Department:</strong>
-                ${employee.department}
-            </p>
-
-            <p>
-                <strong>Role:</strong>
-                ${employee.role}
-            </p>
-
-            <p>
-                <strong>Status:</strong>
-                ${employee.status}
-            </p>
-
-            <p>
-                <strong>Joining Date:</strong>
-                ${employee.joiningDate}
-            </p>
-
-        </div>
-
-        `
-    );
-
-}
-
-
-// ==========================================================
-// EDIT EMPLOYEE
-// ==========================================================
-
-function editEmployee(id) {
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    openModal(
-        "Edit Employee",
-        `
-
-        <form id="editEmployeeForm">
-
-            <label>Full Name</label>
-
-            <input
-                type="text"
-                id="editName"
-                value="${escapeAttribute(
-                    employee.name
-                )}"
-                required
-            >
-
-
-            <label>Email</label>
-
-            <input
-                type="email"
-                id="editEmail"
-                value="${escapeAttribute(
-                    employee.email
-                )}"
-                required
-            >
-
-
-            <label>Phone</label>
-
-            <input
-                type="tel"
-                id="editPhone"
-                value="${escapeAttribute(
-                    employee.phone || ""
-                )}"
-            >
-
-
-            <label>Department</label>
-
-            <select id="editDepartment">
-
-                ${departments
-                    .map(
-                        function (department) {
-
-                            return `
-                                <option
-                                    value="${escapeAttribute(
-                                        department
-                                    )}"
-                                    ${
-                                        department ===
-                                        employee.department
-                                            ? "selected"
-                                            : ""
-                                    }
-                                >
-                                    ${department}
-                                </option>
-                            `;
-
-                        }
-                    )
-                    .join("")}
-
-            </select>
-
-
-            <label>Job Role</label>
-
-            <input
-                type="text"
-                id="editRole"
-                value="${escapeAttribute(
-                    employee.role
-                )}"
-                required
-            >
-
-
-            <label>Joining Date</label>
-
-            <input
-                type="date"
-                id="editJoiningDate"
-                value="${employee.joiningDate}"
-                required
-            >
-
-
-            <label>Status</label>
-
-            <select id="editStatus">
-
-                <option
-                    value="Active"
-                    ${
-                        employee.status === "Active"
-                            ? "selected"
-                            : ""
-                    }
-                >
-                    Active
-                </option>
-
-                <option
-                    value="On Leave"
-                    ${
-                        employee.status === "On Leave"
-                            ? "selected"
-                            : ""
-                    }
-                >
-                    On Leave
-                </option>
-
-                <option
-                    value="Inactive"
-                    ${
-                        employee.status === "Inactive"
-                            ? "selected"
-                            : ""
-                    }
-                >
-                    Inactive
-                </option>
-
-                <option
-                    value="Resigned"
-                    ${
-                        employee.status === "Resigned"
-                            ? "selected"
-                            : ""
-                    }
-                >
-                    Resigned
-                </option>
-
-            </select>
-
-
-            <button
-                type="submit"
-            >
-                Save Changes
-            </button>
-
-        </form>
-
-        `
-    );
-
-
-    document
-        .getElementById("editEmployeeForm")
-        .addEventListener(
+        loginForm.addEventListener(
             "submit",
-            function (event) {
+            function(event) {
 
                 event.preventDefault();
 
-
-                employee.name =
-                    document
-                        .getElementById("editName")
-                        .value
-                        .trim();
-
-
-                employee.email =
-                    document
-                        .getElementById("editEmail")
-                        .value
-                        .trim();
-
-
-                employee.phone =
-                    document
-                        .getElementById("editPhone")
-                        .value
-                        .trim();
-
-
-                employee.department =
-                    document
-                        .getElementById(
-                            "editDepartment"
-                        )
-                        .value;
-
-
-                employee.role =
-                    document
-                        .getElementById("editRole")
-                        .value
-                        .trim();
-
-
-                employee.joiningDate =
-                    document
-                        .getElementById(
-                            "editJoiningDate"
-                        )
-                        .value;
-
-
-                employee.status =
-                    document
-                        .getElementById(
-                            "editStatus"
-                        )
-                        .value;
-
-
-                closeModal();
-
-                updateAll();
-
-                alert(
-                    "Employee details updated successfully."
-                );
-
-            }
-        );
-
-}
-
-
-// ==========================================================
-// ADD EMPLOYEE BUTTON
-// ==========================================================
-
-const addEmployeeBtn =
-    document.getElementById(
-        "addEmployeeBtn"
-    );
-
-
-if (addEmployeeBtn) {
-
-    addEmployeeBtn.addEventListener(
-        "click",
-        function () {
-
-            showPage("addEmployee");
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// DEPARTMENT DROPDOWN
-// ==========================================================
-
-function populateDepartmentDropdown() {
-
-    const dropdown =
-        document.getElementById(
-            "employeeDepartment"
-        );
-
-
-    if (!dropdown) {
-        return;
-    }
-
-
-    dropdown.innerHTML =
-        `
-        <option value="">
-            Select Department
-        </option>
-        `;
-
-
-    departments.forEach(
-        function (department) {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                department;
-
-            option.textContent =
-                department;
-
-
-            dropdown.appendChild(option);
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// ADD EMPLOYEE
-// ==========================================================
-
-const employeeForm =
-    document.getElementById(
-        "employeeForm"
-    );
-
-
-if (employeeForm) {
-
-    employeeForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            const name =
-                document
-                    .getElementById(
-                        "employeeName"
-                    )
-                    .value
-                    .trim();
-
-
-            const email =
-                document
-                    .getElementById(
-                        "employeeEmail"
-                    )
-                    .value
-                    .trim();
-
-
-            const phone =
-                document
-                    .getElementById(
-                        "employeePhone"
-                    )
-                    .value
-                    .trim();
-
-
-            const department =
-                document
-                    .getElementById(
-                        "employeeDepartment"
-                    )
-                    .value;
-
-
-            const role =
-                document
-                    .getElementById(
-                        "employeeRole"
-                    )
-                    .value
-                    .trim();
-
-
-            const joiningDate =
-                document
-                    .getElementById(
-                        "joiningDate"
-                    )
-                    .value;
-
-
-            const status =
-                document
-                    .getElementById(
-                        "employeeStatus"
-                    )
-                    .value;
-
-
-            const duplicateEmail =
-                employees.some(
-                    function (employee) {
-
-                        return (
-                            employee.email.toLowerCase() ===
-                            email.toLowerCase()
-                        );
-
-                    }
-                );
-
-
-            if (duplicateEmail) {
-
-                alert(
-                    "An employee with this email already exists."
-                );
-
-                return;
-
-            }
-
-
-            const newEmployee = {
-
-                id:
-                    generateEmployeeId(),
-
-                name:
-                    name,
-
-                email:
-                    email,
-
-                phone:
-                    phone,
-
-                department:
-                    department,
-
-                role:
-                    role,
-
-                status:
-                    status,
-
-                joiningDate:
-                    joiningDate,
-
-                resignationDate:
-                    null,
-
-                rejoined:
-                    false,
-
-                rejoiningRemarks:
-                    ""
-
-            };
-
-
-            employees.push(
-                newEmployee
-            );
-
-
-            employeeForm.reset();
-
-            updateAll();
-
-            showPage("employees");
-
-
-            alert(
-                "Employee added successfully."
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// GENERATE EMPLOYEE ID
-// ==========================================================
-
-function generateEmployeeId() {
-
-    let highest = 1000;
-
-
-    employees.forEach(
-        function (employee) {
-
-            const number =
-                parseInt(
-                    employee.id.replace(
-                        "EMP",
-                        ""
-                    ),
-                    10
-                );
-
-
-            if (!isNaN(number)) {
-
-                highest =
-                    Math.max(
-                        highest,
-                        number
+                const username =
+                    $("username").value;
+
+                const password =
+                    $("password").value;
+
+                const success =
+                    login(
+                        username,
+                        password
                     );
 
+                if (!success) {
+
+                    $("loginError").textContent =
+                        "Invalid username or password.";
+
+                    $("loginError").style.color =
+                        "#dc2626";
+
+                } else {
+
+                    $("loginError").textContent = "";
+                }
             }
-
-        }
-    );
-
-
-    return "EMP" + (highest + 1);
-
-}
-
-
-// ==========================================================
-// DEPARTMENTS
-// ==========================================================
-
-function renderDepartments() {
-
-    const table =
-        document.getElementById(
-            "departmentTable"
         );
-
-
-    if (!table) {
-        return;
     }
 
 
-    table.innerHTML = "";
+    /* LOGOUT */
 
+    const logoutBtn =
+        $("logoutBtn");
 
-    departments.forEach(
-        function (department, index) {
-
-            const count =
-                employees.filter(
-                    function (employee) {
-
-                        return (
-                            employee.department ===
-                            department
-                        );
-
-                    }
-                ).length;
-
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    DEP${String(
-                        index + 1
-                    ).padStart(3, "0")}
-                </td>
-
-                <td>
-                    ${department}
-                </td>
-
-                <td>
-                    ${count}
-                </td>
-
-                <td>
-                    Active
-                </td>
-
-                <td>
-
-                    <button
-                        type="button"
-                        onclick="viewDepartment('${escapeAttribute(
-                            department
-                        )}')"
-                    >
-                        View
-                    </button>
-
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// VIEW DEPARTMENT
-// ==========================================================
-
-function viewDepartment(
-    department
-) {
-
-    const list =
-        employees.filter(
-            function (employee) {
-
-                return (
-                    employee.department ===
-                    department
-                );
-
-            }
-        );
-
-
-    const names =
-        list.length
-            ? list
-                .map(
-                    function (employee) {
-
-                        return `
-                            <li>
-                                ${employee.name}
-                                - ${employee.role}
-                            </li>
-                        `;
-
-                    }
-                )
-                .join("")
-            : "<li>No employees</li>";
-
-
-    openModal(
-        department,
-        `
-
-        <p>
-            Total Employees:
-            <strong>${list.length}</strong>
-        </p>
-
-        <ul>
-            ${names}
-        </ul>
-
-        `
-    );
-
-}
-
-
-// ==========================================================
-// ADD DEPARTMENT
-// ==========================================================
-
-const addDepartmentBtn =
-    document.getElementById(
-        "addDepartmentBtn"
-    );
-
-
-if (addDepartmentBtn) {
-
-    addDepartmentBtn.addEventListener(
-        "click",
-        function () {
-
-            const name =
-                prompt(
-                    "Enter new department name:"
-                );
-
-
-            if (!name) {
-                return;
-            }
-
-
-            const cleanName =
-                name.trim();
-
-
-            if (!cleanName) {
-                return;
-            }
-
-
-            const exists =
-                departments.some(
-                    function (department) {
-
-                        return (
-                            department.toLowerCase() ===
-                            cleanName.toLowerCase()
-                        );
-
-                    }
-                );
-
-
-            if (exists) {
-
-                alert(
-                    "Department already exists."
-                );
-
-                return;
-
-            }
-
-
-            departments.push(
-                cleanName
-            );
-
-
-            updateAll();
-
-
-            alert(
-                "Department added successfully."
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// ADMIN RESIGNATION
-// ==========================================================
-
-function startAdminResignation(
-    id
-) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can process resignation actions."
-        );
-
-        return;
-
-    }
-
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    if (
-        employee.status === "Resigned"
-    ) {
-
-        alert(
-            "Employee is already resigned."
-        );
-
-        return;
-
-    }
-
-
-    const existing =
-        resignationRequests.find(
-            function (request) {
-
-                return (
-                    request.employeeId === id &&
-                    request.status === "Pending"
-                );
-
-            }
-        );
-
-
-    if (existing) {
-
-        alert(
-            "A resignation request is already pending."
-        );
-
-        return;
-
-    }
-
-
-    openModal(
-        "Resignation Request",
-        `
-
-        <p>
-            Employee:
-            <strong>${employee.name}</strong>
-        </p>
-
-        <p>
-            Employee ID:
-            <strong>${employee.id}</strong>
-        </p>
-
-
-        <label>
-            Last Working Date
-        </label>
-
-        <input
-            type="date"
-            id="adminResignDate"
-            required
-        >
-
-
-        <label>
-            Reason
-        </label>
-
-        <textarea
-            id="adminResignReason"
-            rows="4"
-            placeholder="Enter resignation reason"
-        ></textarea>
-
-
-        <button
-            type="button"
-            id="submitAdminResignation"
-        >
-            Submit Resignation Request
-        </button>
-
-        `
-    );
-
-
-    document
-        .getElementById(
-            "submitAdminResignation"
-        )
-        .addEventListener(
+    if (logoutBtn) {
+        logoutBtn.addEventListener(
             "click",
-            function () {
-
-                const lastDate =
-                    document
-                        .getElementById(
-                            "adminResignDate"
-                        )
-                        .value;
-
-
-                const reason =
-                    document
-                        .getElementById(
-                            "adminResignReason"
-                        )
-                        .value
-                        .trim();
-
-
-                if (!lastDate) {
-
-                    alert(
-                        "Please select the last working date."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!reason) {
-
-                    alert(
-                        "Please enter the reason."
-                    );
-
-                    return;
-
-                }
-
-
-                resignationRequests.push({
-
-                    id:
-                        generateResignationId(),
-
-                    employeeId:
-                        employee.id,
-
-                    employeeName:
-                        employee.name,
-
-                    department:
-                        employee.department,
-
-                    requestedDate:
-                        today(),
-
-                    lastWorkingDate:
-                        lastDate,
-
-                    reason:
-                        reason,
-
-                    status:
-                        "Pending"
-
-                });
-
-
-                closeModal();
-
-                updateAll();
-
-                showPage(
-                    "resignationRequests"
-                );
-
-
-                alert(
-                    "Resignation request sent to Admin approval queue."
-                );
-
-            }
+            logout
         );
-
-}
-
-
-// ==========================================================
-// REJOIN
-// ==========================================================
-
-function rejoinEmployee(
-    id
-) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can process employee rejoining."
-        );
-
-        return;
-
     }
 
 
-    const employee =
-        employees.find(
-            function (item) {
+    /* NAVIGATION */
 
-                return item.id === id;
+    document.querySelectorAll(
+        "#mainNavigation button[data-page]"
+    ).forEach(button => {
 
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    if (
-        employee.status !== "Resigned"
-    ) {
-
-        alert(
-            "Only resigned employees can be rejoined."
-        );
-
-        return;
-
-    }
-
-
-    openModal(
-        "Employee Rejoining",
-        `
-
-        <p>
-            Employee:
-            <strong>${employee.name}</strong>
-        </p>
-
-
-        <label>
-            Rejoining Date
-        </label>
-
-        <input
-            type="date"
-            id="rejoinDate"
-        >
-
-
-        <label>
-            Rejoining Remarks
-        </label>
-
-        <textarea
-            id="rejoinRemarks"
-            rows="4"
-            placeholder="Enter rejoining remarks"
-        ></textarea>
-
-
-        <button
-            type="button"
-            id="saveRejoinButton"
-        >
-            Save Rejoining
-        </button>
-
-        `
-    );
-
-
-    document
-        .getElementById(
-            "saveRejoinButton"
-        )
-        .addEventListener(
+        button.addEventListener(
             "click",
-            function () {
-
-                const date =
-                    document
-                        .getElementById(
-                            "rejoinDate"
-                        )
-                        .value;
-
-
-                const remarks =
-                    document
-                        .getElementById(
-                            "rejoinRemarks"
-                        )
-                        .value
-                        .trim();
+            () => {
+                navigateTo(
+                    button.dataset.page
+                );
+            }
+        );
+    });
 
 
-                if (!date) {
+    /* ADD EMPLOYEE BUTTON */
 
-                    alert(
-                        "Please select rejoining date."
+    const addEmployeeBtn =
+        $("addEmployeeBtn");
+
+    if (addEmployeeBtn) {
+
+        addEmployeeBtn.addEventListener(
+            "click",
+            () => {
+                navigateTo("addEmployee");
+            }
+        );
+    }
+
+
+    /* ADD EMPLOYEE FORM */
+
+    const employeeForm =
+        $("employeeForm");
+
+    if (employeeForm) {
+
+        employeeForm.addEventListener(
+            "submit",
+            addEmployee
+        );
+    }
+
+
+    /* EMPLOYEE SEARCH */
+
+    const employeeSearch =
+        $("employeeSearch");
+
+    if (employeeSearch) {
+
+        employeeSearch.addEventListener(
+            "input",
+            event => {
+                renderEmployees(
+                    event.target.value
+                );
+            }
+        );
+    }
+
+
+    /* GLOBAL SEARCH */
+
+    const globalSearchInput =
+        $("globalSearch");
+
+    if (globalSearchInput) {
+
+        globalSearchInput.addEventListener(
+            "keydown",
+            event => {
+
+                if (event.key === "Enter") {
+
+                    globalSearch(
+                        event.target.value
                     );
-
-                    return;
-
                 }
-
-
-                if (!remarks) {
-
-                    alert(
-                        "Please enter rejoining remarks."
-                    );
-
-                    return;
-
-                }
-
-
-                employee.status =
-                    "Active";
-
-
-                employee.joiningDate =
-                    date;
-
-
-                employee.resignationDate =
-                    null;
-
-
-                employee.rejoined =
-                    true;
-
-
-                employee.rejoiningRemarks =
-                    remarks;
-
-
-                closeModal();
-
-                updateAll();
-
-
-                alert(
-                    `${employee.name} rejoined successfully.`
-                );
-
             }
         );
+    }
 
+
+    /* ADD DEPARTMENT */
+
+    const addDepartmentBtn =
+        $("addDepartmentBtn");
+
+    if (addDepartmentBtn) {
+
+        addDepartmentBtn.addEventListener(
+            "click",
+            addDepartment
+        );
+    }
+
+
+    /* APPLY LEAVE */
+
+    const applyLeaveBtn =
+        $("applyLeaveBtn");
+
+    if (applyLeaveBtn) {
+
+        applyLeaveBtn.addEventListener(
+            "click",
+            applyLeaveForEmployee
+        );
+    }
+
+
+    /* TERMINATION REQUEST */
+
+    const requestResignationBtn =
+        $("requestResignationBtn");
+
+    if (requestResignationBtn) {
+
+        requestResignationBtn.addEventListener(
+            "click",
+            requestTermination
+        );
+    }
+
+
+    /* EXPORT */
+
+    const exportReportBtn =
+        $("exportReportBtn");
+
+    if (exportReportBtn) {
+
+        exportReportBtn.addEventListener(
+            "click",
+            exportReport
+        );
+    }
+
+
+    /* PROFILE */
+
+    const editProfileBtn =
+        $("editProfileBtn");
+
+    if (editProfileBtn) {
+
+        editProfileBtn.addEventListener(
+            "click",
+            editProfile
+        );
+    }
+
+
+    /* VIEW ALL */
+
+    const viewAllBtn =
+        $("viewAllEmployeesBtn");
+
+    if (viewAllBtn) {
+
+        viewAllBtn.addEventListener(
+            "click",
+            viewAllEmployees
+        );
+    }
+
+
+    /* NOTIFICATIONS */
+
+    const notificationBtn =
+        $("notificationBtn");
+
+    if (notificationBtn) {
+
+        notificationBtn.addEventListener(
+            "click",
+            showNotifications
+        );
+    }
+
+
+    /* MENU */
+
+    const menuBtn =
+        $("menuBtn");
+
+    if (menuBtn) {
+
+        menuBtn.addEventListener(
+            "click",
+            toggleMenu
+        );
+    }
 }
 
 
-// ==========================================================
-// RESIGNATION REQUEST TABLE
-// ==========================================================
+/* =========================================================
+   CHANGE OLD RESIGNATION LABELS TO TERMINATION
+   ========================================================= */
 
-function renderResignationRequests() {
+function updateTerminationLabels() {
 
-    const table =
-        document.getElementById(
-            "resignationRequestTable"
-        );
+    document.querySelectorAll("*").forEach(element => {
 
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    resignationRequests.forEach(
-        function (request) {
-
-            const row =
-                document.createElement("tr");
-
-
-            let actions = "Completed";
-
-
-            if (
-                request.status ===
-                "Pending"
-            ) {
-
-                actions = `
-
-                    <button
-                        type="button"
-                        onclick="approveResignation('${request.id}')"
-                    >
-                        Approve
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="rejectResignation('${request.id}')"
-                    >
-                        Reject
-                    </button>
-
-                `;
-
-            }
-
-
-            row.innerHTML = `
-
-                <td>${request.id}</td>
-
-                <td>${request.employeeName}</td>
-
-                <td>${request.department}</td>
-
-                <td>${request.requestedDate}</td>
-
-                <td>${request.lastWorkingDate}</td>
-
-                <td>${request.reason}</td>
-
-                <td>
-                    ${getStatusBadge(
-                        request.status
-                    )}
-                </td>
-
-                <td>
-                    ${actions}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-
-    updateResignationCounts();
-
-}
-
-
-// ==========================================================
-// APPROVE RESIGNATION
-// ==========================================================
-
-function approveResignation(
-    id
-) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can approve resignations."
-        );
-
-        return;
-
-    }
-
-
-    const request =
-        resignationRequests.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!request) {
-        return;
-    }
-
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return (
-                    item.id ===
-                    request.employeeId
-                );
-
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    const confirmApproval =
-        confirm(
-            `Approve resignation for ${employee.name}?`
-        );
-
-
-    if (!confirmApproval) {
-        return;
-    }
-
-
-    request.status =
-        "Approved";
-
-
-    employee.status =
-        "Resigned";
-
-
-    employee.resignationDate =
-        request.lastWorkingDate;
-
-
-    updateAll();
-
-
-    alert(
-        "Resignation approved. Employee status updated to Resigned."
-    );
-
-}
-
-
-// ==========================================================
-// REJECT RESIGNATION
-// ==========================================================
-
-function rejectResignation(
-    id
-) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can reject resignations."
-        );
-
-        return;
-
-    }
-
-
-    const request =
-        resignationRequests.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!request) {
-        return;
-    }
-
-
-    request.status =
-        "Rejected";
-
-
-    updateAll();
-
-
-    alert(
-        "Resignation request rejected."
-    );
-
-}
-
-
-// ==========================================================
-// RESIGNATION COUNTS
-// ==========================================================
-
-function updateResignationCounts() {
-
-    setText(
-        "resignationPendingCount",
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status === "Pending";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "resignationApprovedCount",
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status === "Approved";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "resignationRejectedCount",
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status === "Rejected";
-
-            }
-        ).length
-    );
-
-}
-
-
-// ==========================================================
-// MY RESIGNATION
-// ==========================================================
-
-function renderMyResignation() {
-
-    const container =
-        document.getElementById(
-            "resignationStatus"
-        );
-
-
-    if (!container) {
-        return;
-    }
-
-
-    if (
-        !currentUser ||
-        currentUser.type !== "employee"
-    ) {
-
-        container.innerHTML = `
-            <p>
-                Employee self-service resignation information
-                is available after employee login.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    const requests =
-        resignationRequests.filter(
-            function (request) {
-
-                return (
-                    request.employeeId ===
-                    currentUser.employeeId
-                );
-
-            }
-        );
-
-
-    const latest =
-        requests.length
-            ? requests[requests.length - 1]
-            : null;
-
-
-    if (!latest) {
-
-        container.innerHTML = `
-            <p>
-                No resignation request submitted.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML = `
-
-        <div>
-
-            <p>
-                <strong>Request ID:</strong>
-                ${latest.id}
-            </p>
-
-            <p>
-                <strong>Requested Date:</strong>
-                ${latest.requestedDate}
-            </p>
-
-            <p>
-                <strong>Last Working Date:</strong>
-                ${latest.lastWorkingDate}
-            </p>
-
-            <p>
-                <strong>Reason:</strong>
-                ${latest.reason}
-            </p>
-
-            <p>
-                <strong>Status:</strong>
-                ${getStatusBadge(
-                    latest.status
-                )}
-            </p>
-
-        </div>
-
-    `;
-
-
-    const button =
-        document.getElementById(
-            "requestResignationBtn"
-        );
-
-
-    if (button) {
-
-        button.disabled =
-            latest.status === "Pending" ||
-            latest.status === "Approved";
-
-    }
-
-}
-
-
-// ==========================================================
-// EMPLOYEE RESIGNATION REQUEST
-// ==========================================================
-
-const requestResignationBtn =
-    document.getElementById(
-        "requestResignationBtn"
-    );
-
-
-if (requestResignationBtn) {
-
-    requestResignationBtn.addEventListener(
-        "click",
-        function () {
-
-            if (
-                !currentUser ||
-                currentUser.type !== "employee"
-            ) {
-
-                alert(
-                    "Please login as an employee to submit resignation."
-                );
-
-                return;
-
-            }
-
-
-            const existing =
-                resignationRequests.find(
-                    function (request) {
-
-                        return (
-                            request.employeeId ===
-                            currentUser.employeeId &&
-                            request.status === "Pending"
-                        );
-
-                    }
-                );
-
-
-            if (existing) {
-
-                alert(
-                    "You already have a pending resignation request."
-                );
-
-                return;
-
-            }
-
-
-            openModal(
-                "Submit Resignation",
-                `
-
-                <p>
-                    This request will be sent to Admin
-                    for approval.
-                </p>
-
-
-                <label>
-                    Proposed Last Working Date
-                </label>
-
-                <input
-                    type="date"
-                    id="employeeResignDate"
-                >
-
-
-                <label>
-                    Reason
-                </label>
-
-                <textarea
-                    id="employeeResignReason"
-                    rows="4"
-                    placeholder="Enter reason"
-                ></textarea>
-
-
-                <button
-                    type="button"
-                    id="submitEmployeeResignation"
-                >
-                    Submit to Admin
-                </button>
-
-                `
-            );
-
-
-            document
-                .getElementById(
-                    "submitEmployeeResignation"
-                )
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        const date =
-                            document
-                                .getElementById(
-                                    "employeeResignDate"
-                                )
-                                .value;
-
-
-                        const reason =
-                            document
-                                .getElementById(
-                                    "employeeResignReason"
-                                )
-                                .value
-                                .trim();
-
-
-                        if (!date || !reason) {
-
-                            alert(
-                                "Please complete all fields."
-                            );
-
-                            return;
-
-                        }
-
-
-                        const employee =
-                            employees.find(
-                                function (item) {
-
-                                    return (
-                                        item.id ===
-                                        currentUser.employeeId
-                                    );
-
-                                }
-                            );
-
-
-                        resignationRequests.push({
-
-                            id:
-                                generateResignationId(),
-
-                            employeeId:
-                                employee.id,
-
-                            employeeName:
-                                employee.name,
-
-                            department:
-                                employee.department,
-
-                            requestedDate:
-                                today(),
-
-                            lastWorkingDate:
-                                date,
-
-                            reason:
-                                reason,
-
-                            status:
-                                "Pending"
-
-                        });
-
-
-                        closeModal();
-
-                        updateAll();
-
-                        renderMyResignation();
-
-
-                        alert(
-                            "Resignation request sent to Admin."
-                        );
-
-                    }
-                );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// LEAVE REQUESTS
-// ==========================================================
-
-function renderLeaveRequests() {
-
-    const table =
-        document.getElementById(
-            "leaveRequestTable"
-        );
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    leaveRequests.forEach(
-        function (request) {
-
-            const row =
-                document.createElement("tr");
-
-
-            let actions =
-                "Completed";
-
-
-            if (
-                request.status === "Pending"
-            ) {
-
-                actions = `
-
-                    <button
-                        type="button"
-                        onclick="approveLeave('${request.id}')"
-                    >
-                        Approve
-                    </button>
-
-                    <button
-                        type="button"
-                        onclick="rejectLeave('${request.id}')"
-                    >
-                        Reject
-                    </button>
-
-                `;
-
-            }
-
-
-            row.innerHTML = `
-
-                <td>${request.id}</td>
-
-                <td>${request.employeeName}</td>
-
-                <td>${request.leaveType}</td>
-
-                <td>${request.from}</td>
-
-                <td>${request.to}</td>
-
-                <td>${request.reason}</td>
-
-                <td>
-                    ${getStatusBadge(
-                        request.status
-                    )}
-                </td>
-
-                <td>
-                    ${actions}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-
-    updateLeaveCounts();
-
-}
-
-
-// ==========================================================
-// LEAVE COUNTS
-// ==========================================================
-
-function updateLeaveCounts() {
-
-    setText(
-        "leavePendingCount",
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status === "Pending";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "leaveApprovedCount",
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status === "Approved";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "leaveRejectedCount",
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status === "Rejected";
-
-            }
-        ).length
-    );
-
-}
-
-
-// ==========================================================
-// APPROVE LEAVE
-// ==========================================================
-
-function approveLeave(id) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can approve leave."
-        );
-
-        return;
-
-    }
-
-
-    const request =
-        leaveRequests.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!request) {
-        return;
-    }
-
-
-    request.status =
-        "Approved";
-
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return (
-                    item.id ===
-                    request.employeeId
-                );
-
-            }
-        );
-
-
-    if (employee) {
-
-        employee.status =
-            "On Leave";
-
-    }
-
-
-    updateAll();
-
-
-    alert(
-        "Leave approved successfully."
-    );
-
-}
-
-
-// ==========================================================
-// REJECT LEAVE
-// ==========================================================
-
-function rejectLeave(id) {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "admin"
-    ) {
-
-        alert(
-            "Only Admin can reject leave."
-        );
-
-        return;
-
-    }
-
-
-    const request =
-        leaveRequests.find(
-            function (item) {
-
-                return item.id === id;
-
-            }
-        );
-
-
-    if (!request) {
-        return;
-    }
-
-
-    request.status =
-        "Rejected";
-
-
-    updateAll();
-
-
-    alert(
-        "Leave request rejected."
-    );
-
-}
-
-
-// ==========================================================
-// MY LEAVE
-// ==========================================================
-
-function renderMyLeave() {
-
-    const table =
-        document.getElementById(
-            "myLeaveTable"
-        );
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    if (
-        !currentUser ||
-        currentUser.type !== "employee"
-    ) {
-
-        return;
-
-    }
-
-
-    const myRequests =
-        leaveRequests.filter(
-            function (request) {
-
-                return (
-                    request.employeeId ===
-                    currentUser.employeeId
-                );
-
-            }
-        );
-
-
-    myRequests.forEach(
-        function (request) {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>${request.id}</td>
-
-                <td>${request.leaveType}</td>
-
-                <td>${request.from}</td>
-
-                <td>${request.to}</td>
-
-                <td>${request.reason}</td>
-
-                <td>
-                    ${getStatusBadge(
-                        request.status
-                    )}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-
-    setText(
-        "myPendingLeaves",
-        myRequests.filter(
-            function (request) {
-
-                return request.status === "Pending";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "myApprovedLeaves",
-        myRequests.filter(
-            function (request) {
-
-                return request.status === "Approved";
-
-            }
-        ).length
-    );
-
-
-    setText(
-        "leaveBalance",
-        Math.max(
-            12 -
-            myRequests.filter(
-                function (request) {
-
-                    return request.status === "Approved";
-
-                }
-            ).length,
-            0
-        )
-    );
-
-}
-
-
-// ==========================================================
-// APPLY LEAVE
-// ==========================================================
-
-const applyLeaveBtn =
-    document.getElementById(
-        "applyLeaveBtn"
-    );
-
-
-if (applyLeaveBtn) {
-
-    applyLeaveBtn.addEventListener(
-        "click",
-        function () {
-
-            if (
-                !currentUser ||
-                currentUser.type !== "employee"
-            ) {
-
-                alert(
-                    "Please login as an employee."
-                );
-
-                return;
-
-            }
-
-
-            openModal(
-                "Apply for Leave",
-                `
-
-                <label>
-                    Leave Type
-                </label>
-
-                <select id="applyLeaveType">
-
-                    <option value="">
-                        Select Leave Type
-                    </option>
-
-                    <option value="Casual Leave">
-                        Casual Leave
-                    </option>
-
-                    <option value="Sick Leave">
-                        Sick Leave
-                    </option>
-
-                    <option value="Annual Leave">
-                        Annual Leave
-                    </option>
-
-                </select>
-
-
-                <label>
-                    From Date
-                </label>
-
-                <input
-                    type="date"
-                    id="applyLeaveFrom"
-                >
-
-
-                <label>
-                    To Date
-                </label>
-
-                <input
-                    type="date"
-                    id="applyLeaveTo"
-                >
-
-
-                <label>
-                    Reason
-                </label>
-
-                <textarea
-                    id="applyLeaveReason"
-                    rows="4"
-                    placeholder="Enter reason"
-                ></textarea>
-
-
-                <button
-                    type="button"
-                    id="submitLeaveButton"
-                >
-                    Submit Leave Request
-                </button>
-
-                `
-            );
-
-
-            document
-                .getElementById(
-                    "submitLeaveButton"
-                )
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        const type =
-                            document
-                                .getElementById(
-                                    "applyLeaveType"
-                                )
-                                .value;
-
-
-                        const from =
-                            document
-                                .getElementById(
-                                    "applyLeaveFrom"
-                                )
-                                .value;
-
-
-                        const to =
-                            document
-                                .getElementById(
-                                    "applyLeaveTo"
-                                )
-                                .value;
-
-
-                        const reason =
-                            document
-                                .getElementById(
-                                    "applyLeaveReason"
-                                )
-                                .value
-                                .trim();
-
-
-                        if (
-                            !type ||
-                            !from ||
-                            !to ||
-                            !reason
-                        ) {
-
-                            alert(
-                                "Please complete all leave details."
-                            );
-
-                            return;
-
-                        }
-
-
-                        if (
-                            new Date(from) >
-                            new Date(to)
-                        ) {
-
-                            alert(
-                                "To date cannot be before From date."
-                            );
-
-                            return;
-
-                        }
-
-
-                        const employee =
-                            employees.find(
-                                function (item) {
-
-                                    return (
-                                        item.id ===
-                                        currentUser.employeeId
-                                    );
-
-                                }
-                            );
-
-
-                        leaveRequests.push({
-
-                            id:
-                                generateLeaveId(),
-
-                            employeeId:
-                                employee.id,
-
-                            employeeName:
-                                employee.name,
-
-                            leaveType:
-                                type,
-
-                            from:
-                                from,
-
-                            to:
-                                to,
-
-                            reason:
-                                reason,
-
-                            status:
-                                "Pending"
-
-                        });
-
-
-                        closeModal();
-
-                        updateAll();
-
-                        renderMyLeave();
-
-
-                        alert(
-                            "Leave request submitted to Admin."
-                        );
-
-                    }
-                );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// ATTENDANCE
-// ==========================================================
-
-function renderAttendance() {
-
-    const table =
-        document.getElementById(
-            "attendanceTable"
-        );
-
-
-    if (!table) {
-        return;
-    }
-
-
-    table.innerHTML = "";
-
-
-    const todayDate =
-        today();
-
-
-    employees.forEach(
-        function (employee) {
-
-            let record =
-                attendanceRecords.find(
-                    function (item) {
-
-                        return (
-                            item.employeeId ===
-                            employee.id &&
-                            item.date ===
-                            todayDate
-                        );
-
-                    }
-                );
-
-
-            if (!record) {
-
-                record = {
-
-                    employeeId:
-                        employee.id,
-
-                    employeeName:
-                        employee.name,
-
-                    department:
-                        employee.department,
-
-                    date:
-                        todayDate,
-
-                    checkIn:
-                        "-",
-
-                    checkOut:
-                        "-",
-
-                    status:
-                        employee.status ===
-                        "On Leave"
-                            ? "On Leave"
-                            : "Absent"
-
-                };
-
-            }
-
-
-            const row =
-                document.createElement("tr");
-
-
-            let action = "";
-
-
-            if (
-                currentUser &&
-                currentUser.type === "employee" &&
-                currentUser.employeeId ===
-                employee.id
-            ) {
-
-                if (
-                    record.checkIn === "-"
-                ) {
-
-                    action = `
-
-                        <button
-                            type="button"
-                            onclick="checkIn()"
-                        >
-                            Check In
-                        </button>
-
-                    `;
-
-                } else if (
-                    record.checkOut === "-"
-                ) {
-
-                    action = `
-
-                        <button
-                            type="button"
-                            onclick="checkOut()"
-                        >
-                            Check Out
-                        </button>
-
-                    `;
-
-                }
-
-            }
-
-
-            row.innerHTML = `
-
-                <td>${employee.id}</td>
-
-                <td>${employee.name}</td>
-
-                <td>${employee.department}</td>
-
-                <td>${record.date}</td>
-
-                <td>${record.checkIn}</td>
-
-                <td>${record.checkOut}</td>
-
-                <td>
-                    ${getStatusBadge(
-                        record.status
-                    )}
-                </td>
-
-                <td>
-                    ${action}
-                </td>
-
-            `;
-
-
-            table.appendChild(row);
-
-        }
-    );
-
-
-    updateAttendanceCounts();
-
-}
-
-
-// ==========================================================
-// ATTENDANCE COUNTS
-// ==========================================================
-
-function updateAttendanceCounts() {
-
-    const date =
-        today();
-
-
-    const present =
-        employees.filter(
-            function (employee) {
-
-                const record =
-                    attendanceRecords.find(
-                        function (item) {
-
-                            return (
-                                item.employeeId ===
-                                employee.id &&
-                                item.date ===
-                                date
-                            );
-
-                        }
-                    );
-
-
-                return (
-                    record &&
-                    record.checkIn !== "-"
-                );
-
-            }
-        ).length;
-
-
-    const leave =
-        employees.filter(
-            function (employee) {
-
-                return (
-                    employee.status ===
-                    "On Leave"
-                );
-
-            }
-        ).length;
-
-
-    const absent =
-        Math.max(
-            employees.length -
-            present -
-            leave,
-            0
-        );
-
-
-    setText(
-        "presentToday",
-        present
-    );
-
-    setText(
-        "absentToday",
-        absent
-    );
-
-    setText(
-        "attendanceOnLeave",
-        leave
-    );
-
-}
-
-
-// ==========================================================
-// CHECK IN
-// ==========================================================
-
-function checkIn() {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "employee"
-    ) {
-
-        alert(
-            "Please login as an employee."
-        );
-
-        return;
-
-    }
-
-
-    const employee =
-        employees.find(
-            function (item) {
-
-                return (
-                    item.id ===
-                    currentUser.employeeId
-                );
-
-            }
-        );
-
-
-    if (!employee) {
-        return;
-    }
-
-
-    const date =
-        today();
-
-
-    let record =
-        attendanceRecords.find(
-            function (item) {
-
-                return (
-                    item.employeeId ===
-                    employee.id &&
-                    item.date ===
-                    date
-                );
-
-            }
-        );
-
-
-    if (
-        record &&
-        record.checkIn !== "-"
-    ) {
-
-        alert(
-            "You have already checked in today."
-        );
-
-        return;
-
-    }
-
-
-    const time =
-        new Date()
-            .toLocaleTimeString();
-
-
-    if (!record) {
-
-        record = {
-
-            employeeId:
-                employee.id,
-
-            employeeName:
-                employee.name,
-
-            department:
-                employee.department,
-
-            date:
-                date,
-
-            checkIn:
-                time,
-
-            checkOut:
-                "-",
-
-            status:
-                "Present"
-
-        };
-
-
-        attendanceRecords.push(
-            record
-        );
-
-    } else {
-
-        record.checkIn =
-            time;
-
-        record.status =
-            "Present";
-
-    }
-
-
-    updateAll();
-
-    alert(
-        "Check-in recorded successfully."
-    );
-
-}
-
-
-// ==========================================================
-// CHECK OUT
-// ==========================================================
-
-function checkOut() {
-
-    if (
-        !currentUser ||
-        currentUser.type !== "employee"
-    ) {
-
-        alert(
-            "Please login as an employee."
-        );
-
-        return;
-
-    }
-
-
-    const record =
-        attendanceRecords.find(
-            function (item) {
-
-                return (
-                    item.employeeId ===
-                    currentUser.employeeId &&
-                    item.date ===
-                    today()
-                );
-
-            }
-        );
-
-
-    if (
-        !record ||
-        record.checkIn === "-"
-    ) {
-
-        alert(
-            "Please check in first."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        record.checkOut !== "-"
-    ) {
-
-        alert(
-            "You have already checked out today."
-        );
-
-        return;
-
-    }
-
-
-    record.checkOut =
-        new Date()
-            .toLocaleTimeString();
-
-
-    updateAll();
-
-
-    alert(
-        "Check-out recorded successfully."
-    );
-
-}
-
-
-// ==========================================================
-// REPORTS
-// ==========================================================
-
-function updateReports() {
-
-    const total =
-        employees.length;
-
-
-    const active =
-        employees.filter(
-            function (employee) {
-
-                return employee.status === "Active";
-
-            }
-        ).length;
-
-
-    const leave =
-        employees.filter(
-            function (employee) {
-
-                return employee.status === "On Leave";
-
-            }
-        ).length;
-
-
-    const resigned =
-        employees.filter(
-            function (employee) {
-
-                return employee.status === "Resigned";
-
-            }
-        ).length;
-
-
-    setText(
-        "reportTotal",
-        total
-    );
-
-    setText(
-        "reportActive",
-        active
-    );
-
-    setText(
-        "reportLeave",
-        leave
-    );
-
-    setText(
-        "reportResigned",
-        resigned
-    );
-
-
-    const area =
-        document.getElementById(
-            "employeeReport"
-        );
-
-
-    if (area) {
-
-        area.innerHTML = `
-
-            <p>
-                Total Employees:
-                <strong>${total}</strong>
-            </p>
-
-            <p>
-                Active:
-                <strong>${active}</strong>
-            </p>
-
-            <p>
-                On Leave:
-                <strong>${leave}</strong>
-            </p>
-
-            <p>
-                Resigned:
-                <strong>${resigned}</strong>
-            </p>
-
-        `;
-
-    }
-
-}
-
-
-// ==========================================================
-// DASHBOARD CHARTS
-// ==========================================================
-
-function updateDashboardCharts() {
-
-    const chart =
-        document.getElementById(
-            "departmentDistribution"
-        );
-
-
-    if (chart) {
-
-        const counts = {};
-
-
-        employees.forEach(
-            function (employee) {
-
-                counts[employee.department] =
-                    (
-                        counts[
-                            employee.department
-                        ] || 0
-                    ) + 1;
-
-            }
-        );
-
-
-        chart.innerHTML = "";
-
-
-        Object.keys(counts).forEach(
-            function (department) {
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                row.className =
-                    "chart-row";
-
-
-                const width =
-                    Math.min(
-                        counts[department] * 20,
-                        100
-                    );
-
-
-                row.innerHTML = `
-
-                    <div class="chart-label">
-
-                        <span>
-                            ${department}
-                        </span>
-
-                        <strong>
-                            ${counts[department]}
-                        </strong>
-
-                    </div>
-
-                    <div class="chart-bar">
-
-                        <span
-                            style="width:${width}%"
-                        ></span>
-
-                    </div>
-
-                `;
-
-
-                chart.appendChild(row);
-
-            }
-        );
-
-    }
-
-
-    const trend =
-        document.getElementById(
-            "joiningResignationTrend"
-        );
-
-
-    if (trend) {
-
-        const joined =
-            employees.length;
-
-
-        const resigned =
-            employees.filter(
-                function (employee) {
-
-                    return employee.status ===
-                        "Resigned";
-
-                }
-            ).length;
-
-
-        trend.innerHTML = `
-
-            <div class="trend-content">
-
-                <p>
-                    Total Joined:
-                    <strong>${joined}</strong>
-                </p>
-
-                <p>
-                    Total Resigned:
-                    <strong>${resigned}</strong>
-                </p>
-
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-// ==========================================================
-// DASHBOARD ALERTS
-// ==========================================================
-
-function renderDashboardAlerts() {
-
-    const container =
-        document.getElementById(
-            "dashboardAlerts"
-        );
-
-
-    if (!container) {
-        return;
-    }
-
-
-    const pendingLeaves =
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status ===
-                    "Pending";
-
-            }
-        ).length;
-
-
-    const pendingResignations =
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status ===
-                    "Pending";
-
-            }
-        ).length;
-
-
-    container.innerHTML = "";
-
-
-    if (
-        pendingLeaves === 0 &&
-        pendingResignations === 0
-    ) {
-
-        container.innerHTML = `
-
-            <div class="alert-item">
-
-                <span>●</span>
-
-                <p>
-                    No pending employee actions.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    if (pendingLeaves > 0) {
-
-        container.innerHTML += `
-
-            <div class="alert-item">
-
-                <span>●</span>
-
-                <p>
-                    ${pendingLeaves}
-                    leave request(s) awaiting approval.
-                </p>
-
-            </div>
-
-        `;
-
-    }
-
-
-    if (pendingResignations > 0) {
-
-        container.innerHTML += `
-
-            <div class="alert-item">
-
-                <span>●</span>
-
-                <p>
-                    ${pendingResignations}
-                    resignation request(s) awaiting approval.
-                </p>
-
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-// ==========================================================
-// NOTIFICATIONS
-// ==========================================================
-
-function updateNotifications() {
-
-    const count =
-        leaveRequests.filter(
-            function (request) {
-
-                return request.status ===
-                    "Pending";
-
-            }
-        ).length +
-
-        resignationRequests.filter(
-            function (request) {
-
-                return request.status ===
-                    "Pending";
-
-            }
-        ).length;
-
-
-    setText(
-        "notificationCount",
-        count
-    );
-
-}
-
-
-// ==========================================================
-// NOTIFICATION BUTTON
-// ==========================================================
-
-const notificationBtn =
-    document.getElementById(
-        "notificationBtn"
-    );
-
-
-if (notificationBtn) {
-
-    notificationBtn.addEventListener(
-        "click",
-        function () {
-
-            const leaveCount =
-                leaveRequests.filter(
-                    function (request) {
-
-                        return request.status ===
-                            "Pending";
-
-                    }
-                ).length;
-
-
-            const resignationCount =
-                resignationRequests.filter(
-                    function (request) {
-
-                        return request.status ===
-                            "Pending";
-
-                    }
-                ).length;
-
-
-            alert(
-                "Notifications\n\n" +
-
-                "Pending Leave Requests: " +
-                leaveCount +
-
-                "\nPending Resignation Requests: " +
-                resignationCount
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// VIEW ALL EMPLOYEES
-// ==========================================================
-
-const viewAllEmployeesBtn =
-    document.getElementById(
-        "viewAllEmployeesBtn"
-    );
-
-
-if (viewAllEmployeesBtn) {
-
-    viewAllEmployeesBtn.addEventListener(
-        "click",
-        function () {
-
-            showPage("employees");
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// EMPLOYEE SEARCH
-// ==========================================================
-
-const employeeSearch =
-    document.getElementById(
-        "employeeSearch"
-    );
-
-
-if (employeeSearch) {
-
-    employeeSearch.addEventListener(
-        "input",
-        function () {
+        if (element.children.length === 0) {
 
             const text =
-                employeeSearch.value
-                    .trim()
-                    .toLowerCase();
+                element.textContent.trim();
 
-
-            if (!text) {
-
-                renderEmployees();
-
-                return;
-
+            if (
+                text === "Resignation Requests"
+            ) {
+                element.textContent =
+                    "Termination Requests";
             }
 
-
-            const results =
-                employees.filter(
-                    function (employee) {
-
-                        return (
-
-                            employee.id
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.name
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.email
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.department
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.role
-                                .toLowerCase()
-                                .includes(text)
-
-                        );
-
-                    }
-                );
-
-
-            renderEmployees(
-                results
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// GLOBAL SEARCH
-// ==========================================================
-
-const globalSearch =
-    document.getElementById(
-        "globalSearch"
-    );
-
-
-if (globalSearch) {
-
-    globalSearch.addEventListener(
-        "input",
-        function () {
-
-            const text =
-                globalSearch.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!text) {
-                return;
+            if (
+                text === "Resigned Employees"
+            ) {
+                element.textContent =
+                    "Terminated Employees";
             }
 
-
-            const results =
-                employees.filter(
-                    function (employee) {
-
-                        return (
-
-                            employee.id
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.name
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.email
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.department
-                                .toLowerCase()
-                                .includes(text)
-
-                            ||
-
-                            employee.role
-                                .toLowerCase()
-                                .includes(text)
-
-                        );
-
-                    }
-                );
-
-
-            showPage(
-                "employees"
-            );
-
-
-            renderEmployees(
-                results
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// MENU BUTTON
-// ==========================================================
-
-const menuBtn =
-    document.getElementById(
-        "menuBtn"
-    );
-
-
-if (menuBtn) {
-
-    menuBtn.addEventListener(
-        "click",
-        function () {
-
-            const sidebar =
-                document.querySelector(
-                    ".sidebar"
-                );
-
-
-            if (sidebar) {
-
-                sidebar.classList.toggle(
-                    "sidebar-open"
-                );
-
+            if (
+                text === "My Resignation"
+            ) {
+                element.textContent =
+                    "My Termination";
             }
 
-        }
-    );
-
-}
-
-
-// ==========================================================
-// EDIT PROFILE
-// ==========================================================
-
-const editProfileBtn =
-    document.getElementById(
-        "editProfileBtn"
-    );
-
-
-if (editProfileBtn) {
-
-    editProfileBtn.addEventListener(
-        "click",
-        function () {
-
-            if (!currentUser) {
-                return;
-            }
-
-
-            openModal(
-                "Edit Profile",
-                `
-
-                <label>
-                    Name
-                </label>
-
-                <input
-                    type="text"
-                    id="profileEditName"
-                    value="${escapeAttribute(
-                        currentUser.name
-                    )}"
-                >
-
-
-                <label>
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="profileEditEmail"
-                    value="${escapeAttribute(
-                        currentUser.email
-                    )}"
-                >
-
-
-                <button
-                    type="button"
-                    id="saveProfileButton"
-                >
-                    Save Profile
-                </button>
-
-                `
-            );
-
-
-            document
-                .getElementById(
-                    "saveProfileButton"
+            if (
+                text.includes(
+                    "employee resignations"
                 )
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        const name =
-                            document
-                                .getElementById(
-                                    "profileEditName"
-                                )
-                                .value
-                                .trim();
-
-
-                        const email =
-                            document
-                                .getElementById(
-                                    "profileEditEmail"
-                                )
-                                .value
-                                .trim();
-
-
-                        if (!name || !email) {
-
-                            alert(
-                                "Name and email are required."
-                            );
-
-                            return;
-
-                        }
-
-
-                        currentUser.name =
-                            name;
-
-
-                        currentUser.email =
-                            email;
-
-
-                        if (
-                            currentUser.type ===
-                            "employee"
-                        ) {
-
-                            const employee =
-                                employees.find(
-                                    function (item) {
-
-                                        return (
-                                            item.id ===
-                                            currentUser.employeeId
-                                        );
-
-                                    }
-                                );
-
-
-                            if (employee) {
-
-                                employee.name =
-                                    name;
-
-                                employee.email =
-                                    email;
-
-                            }
-
-                        }
-
-
-                        closeModal();
-
-                        updateCurrentUserUI();
-
-                        updateAll();
-
-
-                        alert(
-                            "Profile updated successfully."
-                        );
-
-                    }
-                );
-
+            ) {
+                element.textContent =
+                    "employee termination requests";
+            }
         }
-    );
-
+    });
 }
 
 
-// ==========================================================
-// EXPORT REPORT
-// ==========================================================
+/* =========================================================
+   INITIALIZATION
+   ========================================================= */
 
-const exportReportBtn =
-    document.getElementById(
-        "exportReportBtn"
-    );
+function initializePortal() {
 
+    loadState();
 
-if (exportReportBtn) {
+    setupEventListeners();
 
-    exportReportBtn.addEventListener(
-        "click",
-        function () {
+    updateTerminationLabels();
 
-            const rows = [
-                [
-                    "Employee ID",
-                    "Name",
-                    "Email",
-                    "Department",
-                    "Role",
-                    "Status",
-                    "Joining Date"
-                ]
-            ];
+    populateDepartmentSelect();
 
+    /*
+       If attendance data doesn't exist,
+       create realistic demo attendance.
+    */
 
-            employees.forEach(
-                function (employee) {
-
-                    rows.push([
-                        employee.id,
-                        employee.name,
-                        employee.email,
-                        employee.department,
-                        employee.role,
-                        employee.status,
-                        employee.joiningDate
-                    ]);
-
-                }
-            );
-
-
-            const csv =
-                rows
-                    .map(
-                        function (row) {
-
-                            return row
-                                .map(
-                                    function (value) {
-
-                                        return `"${String(
-                                            value
-                                        ).replace(
-                                            /"/g,
-                                            '""'
-                                        )}"`;
-
-                                    }
-                                )
-                                .join(",");
-
-                        }
-                    )
-                    .join("\n");
-
-
-            const blob =
-                new Blob(
-                    [csv],
-                    {
-                        type:
-                            "text/csv;charset=utf-8;"
-                    }
-                );
-
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            const link =
-                document.createElement("a");
-
-
-            link.href =
-                url;
-
-
-            link.download =
-                "employee-management-report.csv";
-
-
-            document.body.appendChild(
-                link
-            );
-
-
-            link.click();
-
-
-            link.remove();
-
-
-            URL.revokeObjectURL(
-                url
-            );
-
-        }
-    );
-
-}
-
-
-// ==========================================================
-// MODAL
-// ==========================================================
-
-function openModal(
-    title,
-    content
-) {
-
-    closeModal();
-
-
-    const modal =
-        document.createElement("div");
-
-
-    modal.id =
-        "portalModal";
-
-
-    modal.innerHTML = `
-
-        <div style="
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.55);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:20px;
-            z-index:99999;
-        ">
-
-            <div style="
-                background:white;
-                width:100%;
-                max-width:560px;
-                max-height:90vh;
-                overflow:auto;
-                border-radius:18px;
-                padding:28px;
-                box-shadow:
-                    0 20px 60px
-                    rgba(0,0,0,0.30);
-            ">
-
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    justify-content:space-between;
-                    margin-bottom:20px;
-                ">
-
-                    <h2 style="margin:0;">
-                        ${title}
-                    </h2>
-
-                    <button
-                        type="button"
-                        id="closePortalModal"
-                        style="
-                            border:none;
-                            background:none;
-                            font-size:28px;
-                            cursor:pointer;
-                        "
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-                <div>
-                    ${content}
-                </div>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(
-        modal
-    );
-
-
-    document
-        .getElementById(
-            "closePortalModal"
-        )
-        .addEventListener(
-            "click",
-            closeModal
-        );
-
-}
-
-
-function closeModal() {
-
-    const modal =
-        document.getElementById(
-            "portalModal"
-        );
-
-
-    if (modal) {
-        modal.remove();
+    if (!state.attendance.length) {
+        createAttendanceData();
     }
 
-}
+    /*
+       Existing logged-in user
+       */
 
+    state.currentUser = null;
+saveState();
 
-// ==========================================================
-// ID GENERATORS
-// ==========================================================
-
-function generateLeaveId() {
-
-    return (
-        "LV" +
-        String(
-            1001 +
-            leaveRequests.length
-        )
-    );
+$("appPage").classList.add("hidden");
+$("loginPage").classList.remove("hidden");
 
 }
 
 
-function generateResignationId() {
+/* =========================================================
+   START APPLICATION
+   ========================================================= */
 
-    return (
-        "RES" +
-        String(
-            1001 +
-            resignationRequests.length
-        )
-    );
-
-}
-
-
-// ==========================================================
-// DATE
-// ==========================================================
-
-function today() {
-
-    return new Date()
-        .toISOString()
-        .split("T")[0];
-
-}
-
-
-// ==========================================================
-// SAFE TEXT
-// ==========================================================
-
-function setText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(id);
-
-
-    if (element) {
-
-        element.textContent =
-            value;
-
-    }
-
-}
-
-
-// ==========================================================
-// ESCAPE HTML ATTRIBUTE
-// ==========================================================
-
-function escapeAttribute(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        );
-
-}
-
-
-// ==========================================================
-// INITIALIZE
-// ==========================================================
-
-populateDepartmentDropdown();
-
-console.log(
-    "Employee Management Portal loaded successfully."
-);
+document.addEventListener(
+    "DOMContentLoaded",
+    initializePortal
+); 
