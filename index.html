@@ -3,310 +3,1010 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Employee Management Portal</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- LOGIN PAGE -->
+    <!-- ==================== LOGIN PAGE ==================== -->
+
     <section id="loginPage" class="login-page">
+
         <div class="login-box">
+
             <div class="logo">EM</div>
 
             <h1>Employee Management</h1>
-            <p>Portal Login</p>
+            <p>Employee Management Portal</p>
 
             <form id="loginForm">
-                <label>Username</label>
-                <input type="text" id="username" placeholder="Enter username">
 
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Enter password">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Enter username"
+                    autocomplete="username"
+                    required
+                >
 
-                <button type="submit">Login</button>
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button type="submit">
+                    Login
+                </button>
 
                 <div id="loginError"></div>
 
-                <small>Demo: admin / admin123</small>
+                <small>
+                    Demo Admin: admin / admin123
+                </small>
+
             </form>
+
         </div>
+
     </section>
 
 
-    <!-- APPLICATION -->
+    <!-- ==================== APPLICATION ==================== -->
+
     <section id="appPage" class="app-page hidden">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <h2>Employee Management</h2>
 
-            <nav>
-                <button data-page="dashboard">Dashboard</button>
-                <button data-page="employees">Employees</button>
-                <button data-page="addEmployee">Add Employee</button>
-                <button data-page="departments">Departments</button>
-                <button data-page="reports">Reports</button>
-                <button data-page="profile">Profile</button>
-                <button id="logoutBtn">Logout</button>
+        <!-- ==================== SIDEBAR ==================== -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+
+                <div class="sidebar-logo">
+                    EM
+                </div>
+
+                <div>
+                    <h2>Employee Portal</h2>
+                    <small>Management System</small>
+                </div>
+
+            </div>
+
+
+            <nav id="mainNavigation">
+
+                <button type="button" data-page="dashboard">
+                    🏠 Dashboard
+                </button>
+
+                <button type="button" data-page="employees">
+                    👥 Employees
+                </button>
+
+                <button type="button" data-page="addEmployee">
+                    ➕ Add Employee
+                </button>
+
+                <button type="button" data-page="departments">
+                    🏢 Departments
+                </button>
+
+                <button type="button" data-page="leaveRequests">
+                    📅 Leave Requests
+                </button>
+
+                <button type="button" data-page="resignationRequests">
+                    📄 Resignation Requests
+                </button>
+
+                <button type="button" data-page="attendance">
+                    🕐 Attendance
+                </button>
+
+                <button type="button" data-page="reports">
+                    📊 Reports
+                </button>
+
+                <button type="button" data-page="profile">
+                    👤 Profile
+                </button>
+
+                <button type="button" id="logoutBtn">
+                    🚪 Logout
+                </button>
+
             </nav>
+
         </aside>
 
 
-        <!-- MAIN CONTENT -->
+        <!-- ==================== MAIN CONTENT ==================== -->
+
         <main class="main-content">
 
-            <<header class="topbar">
 
-    <div class="topbar-left">
-        <button class="menu-btn" type="button">☰</button>
-        <h2>Dashboard</h2>
-    </div>
+            <!-- ==================== TOP BAR ==================== -->
 
-    <div class="topbar-right">
+            <header class="topbar">
 
-        <input
-            type="text"
-            id="globalSearch"
-            placeholder="Search by name, ID, email..."
-        >
+                <div class="topbar-left">
 
-        <button class="notification-btn" type="button">
-            🔔
-            <span class="notification-badge">3</span>
-        </button>
+                    <button
+                        class="menu-btn"
+                        type="button"
+                        id="menuBtn"
+                    >
+                        ☰
+                    </button>
 
-        <div class="admin-profile">
-            <div class="admin-avatar">A</div>
+                    <div>
+                        <h2 id="pageTitle">
+                            Dashboard
+                        </h2>
 
-            <div>
-                <strong>Admin</strong>
-                <small>Super Admin</small>
-            </div>
-        </div>
+                        <small id="pageSubtitle">
+                            Employee Management Portal
+                        </small>
+                    </div>
 
-    </div>
-
-</header>
+                </div>
 
 
+                <div class="topbar-right">
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search employees..."
+                    >
+
+
+                    <button
+                        class="notification-btn"
+                        type="button"
+                        id="notificationBtn"
+                    >
+                        🔔
+
+                        <span
+                            class="notification-badge"
+                            id="notificationCount"
+                        >
+                            0
+                        </span>
+
+                    </button>
+
+
+                    <div class="admin-profile">
+
+                        <div
+                            class="admin-avatar"
+                            id="currentUserAvatar"
+                        >
+                            A
+                        </div>
+
+                        <div>
+
+                            <strong id="currentUserName">
+                                Admin
+                            </strong>
+
+                            <small id="currentUserRole">
+                                Super Admin
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ================================================= -->
             <!-- DASHBOARD -->
-<div id="dashboardPage" class="page">
+            <!-- ================================================= -->
 
-    <h1>Dashboard</h1>
-    <p>Welcome back, Admin!</p>
+            <div
+                id="dashboardPage"
+                class="page"
+            >
 
-    <div class="cards dashboard-cards">
+                <div class="page-heading">
 
-        <div class="card">
-            <h3>Total Employees</h3>
-            <strong id="totalEmployees">0</strong>
-            <small>Total workforce</small>
-        </div>
+                    <div>
+                        <h1>Dashboard</h1>
 
-        <div class="card">
-            <h3>Active Employees</h3>
-            <strong id="activeEmployees">0</strong>
-            <small>Currently active</small>
-        </div>
+                        <p>
+                            Welcome back! Here's your workforce overview.
+                        </p>
+                    </div>
 
-        <div class="card">
-            <h3>On Leave</h3>
-            <strong id="onLeaveEmployees">0</strong>
-            <small>Currently on leave</small>
-        </div>
-
-        <div class="card">
-            <h3>Resigned Employees</h3>
-            <strong id="resignedEmployees">0</strong>
-            <small>Former employees</small>
-        </div>
-
-        <div class="card">
-            <h3>New Joiners</h3>
-            <strong id="newJoiners">0</strong>
-            <small>Recent joiners</small>
-        </div>
-
-        <div class="card">
-            <h3>Rejoined Employees</h3>
-            <strong id="rejoinedEmployees">0</strong>
-            <small>Returned employees</small>
-        </div>
-
-        <div class="card">
-            <h3>Departments</h3>
-            <strong id="totalDepartments">0</strong>
-            <small>Active departments</small>
-        </div>
-
-    </div>
-
-    <div class="dashboard-grid">
-
-        <div class="dashboard-panel">
-            <h2>Department Wise Distribution</h2>
-
-            <div id="departmentDistribution" class="chart-placeholder">
-                <p>Department distribution will appear here.</p>
-            </div>
-        </div>
-
-        <div class="dashboard-panel">
-            <h2>Joining vs Resignation Trend</h2>
-
-            <div id="joiningResignationTrend" class="chart-placeholder">
-                <p>Joining and resignation trend will appear here.</p>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="dashboard-grid">
-
-        <div class="dashboard-panel">
-
-            <div class="panel-header">
-                <h2>Recent Employees</h2>
-                <button type="button">View All</button>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Department</th>
-                        <th>Joining Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-
-                <tbody id="recentEmployees"></tbody>
-            </table>
-
-        </div>
-
-        <div class="dashboard-panel">
-
-            <div class="panel-header">
-                <h2>Alerts & Notifications</h2>
-            </div>
-
-            <div id="dashboardAlerts" class="alerts-list">
-
-                <div class="alert-item">
-                    <span>●</span>
-                    <p>Employee retention reviews will appear here.</p>
                 </div>
 
-                <div class="alert-item">
-                    <span>●</span>
-                    <p>Rejoining eligibility alerts will appear here.</p>
+
+                <!-- DASHBOARD CARDS -->
+
+                <div class="cards dashboard-cards">
+
+
+                    <div class="card">
+
+                        <h3>Total Employees</h3>
+
+                        <strong id="totalEmployees">
+                            0
+                        </strong>
+
+                        <small>
+                            Total workforce
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Active Employees</h3>
+
+                        <strong id="activeEmployees">
+                            0
+                        </strong>
+
+                        <small>
+                            Currently active
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>On Leave</h3>
+
+                        <strong id="onLeaveEmployees">
+                            0
+                        </strong>
+
+                        <small>
+                            Currently on leave
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Leave Requests</h3>
+
+                        <strong id="pendingLeaveRequests">
+                            0
+                        </strong>
+
+                        <small>
+                            Awaiting approval
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Resignation Requests</h3>
+
+                        <strong id="pendingResignations">
+                            0
+                        </strong>
+
+                        <small>
+                            Awaiting admin action
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Resigned Employees</h3>
+
+                        <strong id="resignedEmployees">
+                            0
+                        </strong>
+
+                        <small>
+                            Former employees
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>New Joiners</h3>
+
+                        <strong id="newJoiners">
+                            0
+                        </strong>
+
+                        <small>
+                            Recent joiners
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Rejoined Employees</h3>
+
+                        <strong id="rejoinedEmployees">
+                            0
+                        </strong>
+
+                        <small>
+                            Returned employees
+                        </small>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h3>Departments</h3>
+
+                        <strong id="totalDepartments">
+                            0
+                        </strong>
+
+                        <small>
+                            Active departments
+                        </small>
+
+                    </div>
+
                 </div>
 
-                <div class="alert-item">
-                    <span>●</span>
-                    <p>Pending employee actions will appear here.</p>
+
+                <!-- DASHBOARD ANALYTICS -->
+
+                <div class="dashboard-grid">
+
+
+                    <div class="dashboard-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h2>Department Distribution</h2>
+
+                                <small>
+                                    Employees by department
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="departmentDistribution"
+                            class="chart-placeholder"
+                        >
+                            <p>
+                                Department distribution will appear here.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h2>Joining vs Resignation</h2>
+
+                                <small>
+                                    Workforce movement
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="joiningResignationTrend"
+                            class="chart-placeholder"
+                        >
+                            <p>
+                                Joining and resignation trend will appear here.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT EMPLOYEES + ALERTS -->
+
+                <div class="dashboard-grid">
+
+
+                    <div class="dashboard-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h2>Recent Employees</h2>
+
+                                <small>
+                                    Latest employee records
+                                </small>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="viewAllEmployeesBtn"
+                            >
+                                View All
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-container">
+
+                            <table>
+
+                                <thead>
+
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Full Name</th>
+                                        <th>Department</th>
+                                        <th>Joining Date</th>
+                                        <th>Status</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="recentEmployees"></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-panel">
+
+                        <div class="panel-header">
+
+                            <div>
+                                <h2>Alerts & Notifications</h2>
+
+                                <small>
+                                    Important employee activities
+                                </small>
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="dashboardAlerts"
+                            class="alerts-list"
+                        >
+
+                            <div class="alert-item">
+
+                                <span>●</span>
+
+                                <p>
+                                    No new alerts.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
 
-    </div>
-
-</div>
-
-
-
+            <!-- ================================================= -->
             <!-- EMPLOYEES -->
-            <div id="employeesPage" class="page hidden">
+            <!-- ================================================= -->
 
-                <h1>Employees</h1>
-                <p>Manage all employees</p>
+            <div
+                id="employeesPage"
+                class="page hidden"
+            >
 
-                <button id="addEmployeeBtn">+ Add Employee</button>
+                <div class="page-heading">
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Department</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
+                    <div>
 
-                    <tbody id="employeeTable"></tbody>
-                </table>
+                        <h1>Employees</h1>
+
+                        <p>
+                            View and manage all employee records.
+                        </p>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        id="addEmployeeBtn"
+                    >
+                        + Add Employee
+                    </button>
+
+                </div>
+
+
+                <div class="dashboard-panel">
+
+                    <div class="panel-header">
+
+                        <h2>Employee Directory</h2>
+
+                        <input
+                            type="text"
+                            id="employeeSearch"
+                            placeholder="Search employee..."
+                        >
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="employeeTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
+            <!-- ================================================= -->
             <!-- ADD EMPLOYEE -->
-            <div id="addEmployeePage" class="page hidden">
+            <!-- ================================================= -->
 
-                <h1>Add New Employee</h1>
+            <div
+                id="addEmployeePage"
+                class="page hidden"
+            >
 
-                <form id="employeeForm">
+                <div class="page-heading">
 
-                    <label>Full Name</label>
-                    <input type="text" id="employeeName" required>
+                    <div>
 
-                    <label>Email</label>
-                    <input type="email" id="employeeEmail" required>
+                        <h1>Add New Employee</h1>
 
-                    <label>Department</label>
-                    <select id="employeeDepartment" required>
-                        <option value="">Select Department</option>
-                    </select>
+                        <p>
+                            Create a new employee record.
+                        </p>
 
-                    <label>Role</label>
-                    <input type="text" id="employeeRole" required>
-<label for="joiningDate">Joining Date</label>
-<input type="date" id="joiningDate" required>
+                    </div>
 
-                    <label>Status</label>
-                    <select id="employeeStatus">
-                        <option>Active</option>
-                        <option>On Leave</option>
-                        <option>Inactive</option>
-                    </select>
+                </div>
 
-                    <button type="submit">Save Employee</button>
 
-                </form>
+                <div class="dashboard-panel">
+
+                    <form id="employeeForm">
+
+
+                        <label for="employeeName">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="employeeName"
+                            required
+                        >
+
+
+                        <label for="employeeEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="employeeEmail"
+                            required
+                        >
+
+
+                        <label for="employeePhone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="employeePhone"
+                            placeholder="Enter phone number"
+                        >
+
+
+                        <label for="employeeDepartment">
+                            Department
+                        </label>
+
+                        <select
+                            id="employeeDepartment"
+                            required
+                        >
+
+                            <option value="">
+                                Select Department
+                            </option>
+
+                        </select>
+
+
+                        <label for="employeeRole">
+                            Job Role
+                        </label>
+
+                        <input
+                            type="text"
+                            id="employeeRole"
+                            required
+                        >
+
+
+                        <label for="joiningDate">
+                            Joining Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="joiningDate"
+                            required
+                        >
+
+
+                        <label for="employeeStatus">
+                            Employment Status
+                        </label>
+
+                        <select id="employeeStatus">
+
+                            <option value="Active">
+                                Active
+                            </option>
+
+                            <option value="On Leave">
+                                On Leave
+                            </option>
+
+                            <option value="Inactive">
+                                Inactive
+                            </option>
+
+                        </select>
+
+
+                        <button type="submit">
+                            Save Employee
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
 
+            <!-- ================================================= -->
             <!-- DEPARTMENTS -->
-            <div id="departmentsPage" class="page hidden">
+            <!-- ================================================= -->
 
-                <h1>Departments</h1>
+            <div
+                id="departmentsPage"
+                class="page hidden"
+            >
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Department Name</th>
-                        </tr>
-                    </thead>
+                <div class="page-heading">
 
-                    <tbody id="departmentTable"></tbody>
-                </table>
+                    <div>
+
+                        <h1>Departments</h1>
+
+                        <p>
+                            Manage company departments.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-panel">
+
+                    <div class="panel-header">
+
+                        <h2>Department Directory</h2>
+
+                        <button
+                            type="button"
+                            id="addDepartmentBtn"
+                        >
+                            + Add Department
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>ID</th>
+                            
+<th>Name</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="departmentTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LEAVE REQUESTS -->
+
+            <div id="leaveRequestsPage" class="page hidden">
+
+                <h1>Leave Requests</h1>
+
+                <p>
+                    Review and manage employee leave requests.
+                </p>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <h3>Pending</h3>
+                        <strong id="leavePendingCount">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Approved</h3>
+                        <strong id="leaveApprovedCount">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Rejected</h3>
+                        <strong id="leaveRejectedCount">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="dashboard-panel">
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Employee</th>
+                                    <th>Leave Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="leaveRequestTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESIGNATION REQUESTS -->
+
+            <div id="resignationRequestsPage" class="page hidden">
+
+                <h1>Resignation Requests</h1>
+
+                <p>
+                    Admin approval is required for employee resignations.
+                </p>
+
+                <div class="cards">
+
+                    <div class="card">
+
+                        <h3>Pending</h3>
+                        <strong id="resignationPendingCount">0</strong>
+
+                    </div>
+
+                    <div class="card">
+
+                        <h3>Approved</h3>
+                        <strong id="resignationApprovedCount">0</strong>
+
+                    </div>
+
+                    <div class="card">
+
+                        <h3>Rejected</h3>
+                        <strong id="resignationRejectedCount">0</strong>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-panel">
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Last Working Date</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Admin Action</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="resignationRequestTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ATTENDANCE -->
+
+            <div id="attendancePage" class="page hidden">
+
+                <h1>Attendance</h1>
+
+                <p>
+                    Track employee attendance and working status.
+                </p>
+
+                <div class="cards">
+
+                    <div class="card">
+                        <h3>Present Today</h3>
+                        <strong id="presentToday">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Absent Today</h3>
+                        <strong id="absentToday">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>On Leave</h3>
+                        <strong id="attendanceOnLeave">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="dashboard-panel">
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Date</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="attendanceTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
             <!-- REPORTS -->
+
             <div id="reportsPage" class="page hidden">
 
                 <h1>Reports</h1>
 
+                <p>
+                    Workforce and employee management reports.
+                </p>
+
                 <div class="cards">
+
                     <div class="card">
                         <h3>Total Employees</h3>
                         <strong id="reportTotal">0</strong>
@@ -316,28 +1016,88 @@
                         <h3>Active Employees</h3>
                         <strong id="reportActive">0</strong>
                     </div>
+
+                    <div class="card">
+                        <h3>Employees On Leave</h3>
+                        <strong id="reportLeave">0</strong>
+                    </div>
+
+                    <div class="card">
+                        <h3>Resigned</h3>
+                        <strong id="reportResigned">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="dashboard-panel">
+
+                    <h2>Employee Report</h2>
+
+                    <div id="employeeReport"></div>
+
                 </div>
 
             </div>
 
 
             <!-- PROFILE -->
+
             <div id="profilePage" class="page hidden">
 
                 <h1>My Profile</h1>
 
-                <div class="profile-box">
-                    <h2>Admin User</h2>
-                    <p>Email: admin@example.com</p>
-                    <p>Role: Administrator</p>
+                <div class="dashboard-panel profile-box">
+
+                    <div class="profile-avatar">
+                        A
+                    </div>
+
+                    <h2 id="profileName">
+                        Admin User
+                    </h2>
+
+                    <p>
+                        Email:
+                        <span id="profileEmail">
+                            admin@example.com
+                        </span>
+                    </p>
+
+                    <p>
+                        Role:
+                        <span id="profileRole">
+                            Administrator
+                        </span>
+                    </p>
+
+                    <p>
+                        Employee ID:
+                        <span id="profileEmployeeId">
+                            ADMIN001
+                        </span>
+                    </p>
+
+                    <button
+                        type="button"
+                        id="editProfileBtn"
+                    >
+                        Edit Profile
+                    </button>
+
                 </div>
 
             </div>
 
+
         </main>
+
     </section>
+
+
+    <!-- JAVASCRIPT -->
 
     <script src="script.js"></script>
 
 </body>
+
 </html>
