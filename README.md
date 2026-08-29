@@ -1,53 +1,24 @@
-<div align="center">
+# Employee Management Portal
 
-# 👨‍💼 Employee Management Portal
-
-### 🚀 Modern • Responsive • Professional HR Management Application
-
-<p>
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
-  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white">
-  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white">
-  <img src="https://img.shields.io/badge/GitHub%20Pages-222222?style=for-the-badge&logo=github&logoColor=white">
-</p>
-
-<p>
-  <a href="https://varma160.github.io/employee-management-portal/">
-    <img src="https://img.shields.io/badge/🌐_LIVE_DEMO-Visit_Website-4F46E5?style=for-the-badge">
-  </a>
-</p>
-
-</div>
+🚀 Modern • Responsive • Professional HR Management Application
 
 ---
 
 ## 🌟 About The Project
 
-**Employee Management Portal** is a modern web-based HR management application designed to simplify employee management and employee lifecycle operations.
+Employee Management Portal is a web-based HR management application designed to simulate real-world employee management and employee lifecycle operations.
 
-The application provides an administrator-friendly interface for managing employee information, monitoring employee status, handling resignations, and supporting employee rejoining scenarios.
+The application provides Admin and Employee workflows for managing employee records, leave requests, departments, attendance, termination requests, reports, and employee lifecycle activities.
 
 The project focuses on:
 
-> 🎯 Clean UI  
-> ⚡ Simple workflow  
-> 📱 Responsive design  
-> 🔄 Employee lifecycle management  
-> 🧩 Practical real-world scenarios
-
----
-
-## 🖥️ Application Preview
-
-<div align="center">
-
-### 📊 Dashboard
-
-<img src="https://placehold.co/1000x500/4F46E5/FFFFFF?text=Employee+Management+Portal+Dashboard" width="90%">
-
-</div>
+- 🎯 Clean and professional UI
+- ⚡ Practical HR workflows
+- 📱 Responsive design
+- 🔄 Employee lifecycle management
+- 📊 Dynamic dashboard
+- 🔐 Admin and Employee workflows
+- 🚀 Azure DevOps CI/CD
 
 ---
 
@@ -55,46 +26,49 @@ The project focuses on:
 
 | Feature | Description |
 |---|---|
-| 📊 **Dashboard** | Employee statistics and management overview |
-| 👥 **Employee Management** | View and manage employee records |
-| ➕ **Add Employee** | Add new employee information |
-| 🔍 **Search** | Quickly find employee information |
-| 📅 **Joining Date** | Maintain employee joining information |
-| 🚪 **Resignation** | Manage employee resignation |
-| 🔄 **Rejoining** | Rejoin previously resigned employees |
-| 📈 **Reports** | Employee management information |
-| 🎨 **Modern UI** | Professional and attractive interface |
-| 📱 **Responsive Design** | Designed for desktop and mobile screens |
+| 📊 Dashboard | Dynamic workforce statistics and employee overview |
+| 👥 Employee Management | Manage employee records |
+| ➕ Add Employee | Add new employee information |
+| 🔍 Employee Search | Search by ID, name, email, department, role, or status |
+| 👤 Employee Login | Separate employee login workflow |
+| 👨‍💼 Admin Login | Admin access to management functions |
+| 📅 Leave Management | Apply and manage employee leave |
+| 📝 Leave Reason | Leave requests include employee reason |
+| ✅ Leave Approval | Admin can approve or reject leave requests |
+| 🏢 Departments | Manage departments and employee counts |
+| 🕐 Attendance | Track employee attendance |
+| 📊 Reports | Workforce and employee reports |
+| 🚪 Termination | Terminate employees with termination reason |
+| 🔄 Rejoining | Rejoin previously terminated employees |
+| 🔔 Notifications | Display important employee activities |
+| 📱 Responsive UI | Desktop and mobile friendly interface |
 
 ---
 
-# 👥 Employee Management
+## 👥 Employee Management
 
-The portal provides a centralized employee management interface.
+The portal maintains approximately **1700 employee records** for realistic testing and demonstration.
 
 ### Employee Information
 
 - 🆔 Employee ID
 - 👤 Employee Name
 - 📧 Email
+- 📞 Phone Number
 - 🏢 Department
-- 💼 Role
+- 💼 Job Role
 - 📅 Joining Date
-- 🚦 Employee Status
+- 🚦 Employment Status
 
-### Supported Status
+### Supported Employee Status
 
-🟢 **Active**
-
-🟡 **On Leave**
-
-🔴 **Resigned**
+- 🟢 Active
+- 🟡 On Leave
+- 🔴 Terminated
 
 ---
 
-# 🔄 Employee Lifecycle
-
-The application supports a practical employee lifecycle workflow.
+## 🔄 Employee Lifecycle
 
 ```text
         👤 NEW EMPLOYEE
@@ -102,34 +76,121 @@ The application supports a practical employee lifecycle workflow.
               ▼
         🟢 ACTIVE
               │
-              │ Resignation
+              │ Termination
               ▼
-        🔴 RESIGNED
+        🔴 TERMINATED
               │
               │ Rejoin
               ▼
         🟢 ACTIVE
+📅 Leave Management
+
+Employees can submit leave requests with:
+Leave Type
+From Date
+To Date
+Reason
+The leave request is stored and displayed in the Admin Leave Requests section.
+
+Admin Actions
+Admin can:
+
+Review leave requests
+
+View employee details
+
+View leave reason
+
+Approve leave requests
+
+Reject leave requests
+
+Dashboard and leave statistics update according to the request status.
+
+🏢 Department Management
+
+The portal provides department management functionality.
+
+Admin can:
+View departments
+View employee count by department
+Add departments
+Manage department status
+
+🕐 Attendance
+
+The Attendance module provides employee attendance information including:
+
+Employee ID
+Employee Name
+Department
+Date
+Check-in
+Check-out
+Attendance Status
+
+Attendance Statistics
+
+Present Today
+Absent Today
+On Leave
 
 📊 Dashboard
-The dashboard provides a quick overview of employee information.
-Dashboard Includes
-👥 Total Employees
-🟢 Active Employees
-🟡 Employees On Leave
-🔴 Resigned Employees
-📈 Employee Reports
-🔎 Employee Search
-🔍 Employee Search
-The application provides employee search functionality for quickly finding employee information.
-Employees can be searched using available information such as:
-Employee ID
-Name
-Email
-Department
-Role
-Status
+
+The dashboard dynamically displays workforce information including:
+
+Total Employees
+Active Employees
+Employees On Leave
+Pending Leave Requests
+Pending Termination Requests
+Terminated Employees
+New Joiners
+Rejoined Employees
+Departments
+Department Distribution
+Joining vs Termination information
+Recent Employees
+Alerts & Notifications
+
+🚪 Termination Workflow
+🟢 ACTIVE EMPLOYEE
+        │
+        ▼
+   Termination
+        │
+        ▼
+🔴 TERMINATED
+        │
+        ▼
+      Rejoin
+        │
+        ▼
+🟢 ACTIVE
+Termination records include:
+Termination Date
+Termination Reason
+Employee Status
+
+👨‍💼 Admin & Employee Workflow
+              LOGIN
+                │
+        ┌───────┴───────┐
+        ▼               ▼
+      ADMIN           EMPLOYEE
+        │               │
+        ▼               ▼
+   Management       Self Service
+        │               │
+   ┌────┼────┐      ┌───┴────┐
+   ▼    ▼    ▼      ▼        ▼
+Leave Employees   My Leave  Profile
+Dept  Reports     Attendance
+Attendance
+Termination
+
 🎨 UI / UX Design
-The application has been designed with a modern professional interface.
+The application provides a modern professional interface.
 Design Highlights
 ✨ Modern dashboard
 🎨 Professional color theme
@@ -139,7 +200,8 @@ Design Highlights
 📋 Modern employee tables
 🔎 Clean search interface
 📱 Responsive layout
-⚡ Smooth hover effects
+⚡ Smooth user interactions
+
 🏗️ Application Architecture
                     👨‍💼 ADMIN
                        │
@@ -149,39 +211,44 @@ Design Highlights
               └─────────────────┘
                        │
         ┌──────────────┼──────────────┐
-        │ │ │
-        ▼ ▼ ▼
-   📊 Dashboard 👥 Employees 📈 Reports
+        │              │              │
+        ▼              ▼              ▼
+   📊 Dashboard   👥 Employees     📈 Reports
                        │
              ┌─────────┼─────────┐
-             │ │ │
-             ▼ ▼ ▼
-          ➕ Add 🔍 Search 🔄 Lifecycle
-                                 │
-                         ┌───────┴───────┐
-                         ▼ ▼
-                      🚪 Resign 🔄 Rejoin
-                         │ │
-                         ▼ ▼
-                     🔴 Resigned 🟢 Active
+             │         │         │
+             ▼         ▼         ▼
+          ➕ Add     🔍 Search   🔄 Lifecycle
+                                  │
+                           ┌──────┴──────┐
+                           ▼             ▼
+                       🚪 Terminate   🔄 Rejoin
+                           │             │
+                           ▼             ▼
+                     🔴 Terminated   🟢 Active
+
 🛠️ Technology Stack
-�
 
 Technology
 Usage
 🟧 HTML5
 Application structure
 🔵 CSS3
-Styling & responsive UI
+Styling and responsive UI
 🟨 JavaScript
-Application logic
+Application logic and dynamic functionality
 🟠 Git
 Version control
 ⚫ GitHub
 Source code management
-🌐 GitHub Pages
-Live deployment
-�
+☁️ Azure DevOps
+CI/CD pipeline
+📄 YAML
+Pipeline configuration
+🌐 Azure Static Web Apps
+Application deployment
+🚀 GitHub Pages
+Live website hosting
 
 📁 Project Structure
 employee-management-portal/
@@ -189,25 +256,33 @@ employee-management-portal/
 ├── 📄 index.html
 ├── 🎨 style.css
 ├── ⚙️ script.js
+├── ☁️ azure-pipelines.yml
 └── 📖 README.md
-🔧 Git Workflow
-The project is maintained using Git version control.
+
+🔧 Git & DevOps Workflow
 👨‍💻 Development
        │
        ▼
-   💻 VS Code
+💻 VS Code
        │
        ▼
-    📦 Git
+📦 Git
        │
        ▼
-   🐙 GitHub
+🐙 GitHub main
        │
        ▼
-   🌐 GitHub Pages
+☁️ Azure DevOps Pipeline
        │
        ▼
-   🚀 Live Website
+📄 YAML CI/CD
+       │
+       ▼
+🌐 Azure Static Web Apps
+       │
+       ▼
+🚀 Live Application
+
 Common Git Commands
 git status
 
@@ -216,77 +291,86 @@ git add .
 git commit -m "update employee management portal"
 
 git push
-🌐 Deployment
-The application is deployed using GitHub Pages.
-Deployment Flow
-💻 VS Code
-    ↓
-📦 Git Commit
-    ↓
-🐙 GitHub Repository
-    ↓
-🌐 GitHub Pages
-    ↓
-🚀 Live Application
-🔗 Live Demo
-�
 
-🚀 OPEN LIVE EMPLOYEE PORTAL⁠�
-�
-
-📌 Project Status
-✅ Completed
-[x] Employee Management Portal UI
-[x] Modern Dashboard
-[x] Employee Management
-[x] Add Employee
-[x] Employee Search
-[x] Employee Status
-[x] Joining Date
-[x] Resignation Date
-[x] Resignation Functionality
-[x] Rejoining Functionality
-[x] Dynamic Resign / Rejoin Buttons
-[x] Reports
-[x] Admin Profile
-[x] Responsive UI
-[x] Professional Styling
-[x] Git Version Control
-[x] GitHub Repository
-[x] GitHub Pages Deployment
-🚀 Future Enhancements
-The project can be further enhanced with:
-[ ] 💾 Persistent employee data
-[ ] 🔍 Advanced filtering
-[ ] 🛡️ Role-based access control
-[ ] 📝 Employee audit history
-[ ] 👥 Duplicate employee validation
-[ ] 📊 Advanced analytics
-[ ] 🧪 Automated testing
-[ ] ☁️ Azure DevOps CI/CD
-[ ] 🚀 Automated deployment pipeline
-☁️ DevOps Roadmap
-The next phase of this project is to integrate Azure DevOps CI/CD.
-Planned Pipeline
+🚀 CI/CD Pipeline
+The project uses an Azure DevOps YAML pipeline to automate the application deployment process.
+Pipeline Process
 👨‍💻 Developer
       │
       ▼
-🐙 GitHub
+💻 VS Code
+      │
+      ▼
+📦 Git Commit
+      │
+      ▼
+🐙 GitHub main
       │
       ▼
 ☁️ Azure DevOps
       │
       ▼
-🔨 Build
+📄 YAML Pipeline
       │
       ▼
-🧪 Test
-      │
-      ▼
-🚀 Deploy
+🚀 Azure Static Web Apps
       │
       ▼
 🌐 Live Application
+The pipeline is configured to run automatically when updated code is pushed to the main branch.
+
+🌐 Deployment
+The application uses:
+GitHub for source code management
+Azure DevOps for CI/CD
+YAML for pipeline configuration
+Azure Static Web Apps for deployment
+GitHub Pages for live website publishing
+
+Deployment Flow
+💻 VS Code
+    ↓
+📦 Git
+    ↓
+🐙 GitHub main
+    ↓
+☁️ Azure DevOps Pipeline
+    ↓
+🚀 Azure Static Web Apps
+    ↓
+🌐 Live Application
+The live application was verified after deployment.
+
+📌 Project Status
+Completed
+[x] Employee Management Portal UI
+[x] Modern Dashboard
+[x] Responsive Design
+[x] Approximately 1700 Employee Records
+[x] Admin Login
+[x] Employee Login Workflow
+[x] Employee Management
+[x] Add Employee
+[x] Employee Search
+[x] Employee Status
+[x] Joining Date
+[x] Leave Application
+[x] Leave Reason
+[x] Leave Approval / Rejection
+[x] Department Management
+[x] Attendance
+[x] Reports
+[x] Termination Workflow
+[x] Rejoining Workflow
+[x] Dynamic Dashboard
+[x] Notifications
+[x] Git Version Control
+[x] GitHub Repository
+[x] Azure DevOps YAML Pipeline
+[x] Azure Static Web Apps Deployment
+[x] GitHub Pages Deployment
+[x] Live Website Verification
+
 🎯 Learning Outcomes
 Through this project, practical experience was gained in:
 🌐 Frontend Development
@@ -295,53 +379,88 @@ Through this project, practical experience was gained in:
 ⚙️ JavaScript
 🔄 Employee Lifecycle Management
 🐙 Git & GitHub
-🌐 GitHub Pages
+☁️ Azure DevOps
+📄 YAML Pipelines
+🔁 CI/CD
+🌐 Azure Static Web Apps
 📱 Responsive Web Design
 🐛 Debugging & Troubleshooting
-🚀 Basic DevOps Concepts
-🔁 CI/CD Concepts
 🏗️ Real-World Project Structure
+
 💡 Real-World Scenarios
-The application considers practical HR scenarios such as:
-Scenario 1 — Employee Resignation
+Scenario 1 — Leave Request
+Employee
+   ↓
+Apply Leave
+   ↓
+Enter Leave Details
+   ↓
+Enter Reason
+   ↓
+Admin Reviews
+   ↓
+Approve / Reject
+   ↓
+Dashboard Updated
+
+Scenario 2 — Employee Termination
 Active Employee
       ↓
-Resignation
+Termination Request
       ↓
-Resigned
+Admin Action
       ↓
-Rejoin Available
-Scenario 2 — Employee Rejoining
-Resigned Employee
+Termination Reason
+      ↓
+Terminated
       ↓
 Rejoin
       ↓
 Active Employee
-Scenario 3 — Dynamic Actions
-🟢 Active
-   → Resign
 
-🔴 Resigned
-   → Rejoin
-This makes the application behave more like a practical employee management system rather than a static UI demo.
+Scenario 3 — Employee Rejoining
+Terminated Employee
+        ↓
+      Rejoin
+        ↓
+   Active Employee
+
+Scenario 4 — CI/CD
+Code Change
+    ↓
+Git Commit
+    ↓
+GitHub main
+    ↓
+Azure DevOps Pipeline
+    ↓
+Automatic Deployment
+    ↓
+Azure Static Web Apps
+    ↓
+Live Website
+
 🏆 Project Highlights
 ⭐ Modern Employee Management Portal
-⭐ Responsive & Professional UI
-⭐ Employee Lifecycle Management
-⭐ Resign & Rejoin Workflow
-⭐ Dynamic Employee Actions
+⭐ Approximately 1700 Employee Records
+⭐ Admin & Employee Workflows
+⭐ Leave Management with Reason and Approval/Rejection
+⭐ Department Management
+⭐ Attendance Management
+⭐ Termination & Rejoining Workflow
+⭐ Dynamic Dashboard
+⭐ Employee Search
 ⭐ Git & GitHub Integration
+⭐ Azure DevOps CI/CD Pipeline
+⭐ YAML Pipeline Configuration
+⭐ Azure Static Web Apps Deployment
 ⭐ GitHub Pages Deployment
-⭐ Ready for Azure DevOps CI/CD Integration
-
+⭐ Live Application
 
 👨‍💻 Author
-�
-Mohan sai Varma
-Employee Management Portal
-Frontend Development • Git • GitHub • DevOps
-�
+Mohan Sai Varma
 
-�
+Employee Management Portal
+Frontend Development • Git • GitHub • Azure DevOps • CI/CD
 
 ⭐ If you like this project, consider giving it a star!
