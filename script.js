@@ -813,7 +813,9 @@ function renderAlerts() {
 /* =========================================================
    EMPLOYEE DIRECTORY
    ========================================================= */
-
+let employeeCurrentPage = 1;
+let employeeLastSearch = "";
+const EMPLOYEES_PER_PAGE = 50;
 function renderEmployees(search = "") {
 
     const tbody = $("employeeTable");
@@ -839,7 +841,13 @@ function renderEmployees(search = "") {
             .includes(search);
     });
 
-    tbody.innerHTML = employees.map(employee => {
+    tbody.innerHTML = employees
+    .slice(
+        (employeeCurrentPage - 1) * EMPLOYEES_PER_PAGE,
+        employeeCurrentPage * EMPLOYEES_PER_PAGE
+    )
+    .map(employee => {
+
 
         const isTerminated =
             employee.status === "Terminated";
@@ -901,6 +909,49 @@ function renderEmployees(search = "") {
     }).join("");
 
     bindEmployeeActionButtons();
+    const totalPages = Math.ceil(employees.length / EMPLOYEES_PER_PAGE);
+
+let pagination = document.getElementById("employeePagination");
+
+if (!pagination) {
+    const table = tbody.closest("table");
+
+    pagination = document.createElement("div");
+    pagination.id = "employeePagination";
+
+    table.insertAdjacentElement("afterend", pagination);
+}
+
+pagination.innerHTML = `
+    <div style="display:flex; gap:8px; align-items:center; justify-content:center; margin:20px 0; flex-wrap:wrap;">
+        <button type="button" id="employeePrevPage"
+            ${employeeCurrentPage === 1 ? "disabled" : ""}>
+            Previous
+        </button>
+
+        <span>Page ${employeeCurrentPage} of ${totalPages}</span>
+
+        <button type="button" id="employeeNextPage"
+            ${employeeCurrentPage === totalPages ? "disabled" : ""}>
+            Next
+        </button>
+    </div>
+`;
+
+document.getElementById("employeePrevPage").onclick = function () {
+    if (employeeCurrentPage > 1) {
+        employeeCurrentPage--;
+        renderEmployees(employeeLastSearch);
+    }
+};
+
+document.getElementById("employeeNextPage").onclick = function () {
+    if (employeeCurrentPage < totalPages) {
+        employeeCurrentPage++;
+        renderEmployees(employeeLastSearch);
+    }
+};
+
 }
 
 function bindEmployeeActionButtons() {
@@ -2921,3 +2972,39 @@ document.addEventListener(
     "DOMContentLoaded",
     initializePortal
 ); 
+// Employee Login
+const employeeLoginTab = document.getElementById("employeeLoginTab");
+const adminLoginTab = document.getElementById("adminLoginTab");
+const loginForm = document.getElementById("loginForm");
+const employeeLoginForm = document.getElementById("employeeLoginForm");
+
+employeeLoginTab.addEventListener("click", function () {
+    loginForm.classList.add("hidden");
+    employeeLoginForm.classList.remove("hidden");
+
+    adminLoginTab.classList.remove("active");
+    employeeLoginTab.classList.add("active");
+});
+
+adminLoginTab.addEventListener("click", function () {
+    employeeLoginForm.classList.add("hidden");
+    loginForm.classList.remove("hidden");
+
+    employeeLoginTab.classList.remove("active");
+    adminLoginTab.classList.add("active");
+});
+employeeLoginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const employeeId = document.getElementById("employeeLoginId").value.trim();
+    const employeePassword = document.getElementById("employeeLoginPassword").value.trim();
+
+    const success = login(employeeId, employeePassword);
+
+    if (!success) {
+        document.getElementById("employeeLoginError").textContent =
+            "Invalid Employee ID or Password.";
+    } else {
+        document.getElementById("employeeLoginError").textContent = "";
+    }
+    });
